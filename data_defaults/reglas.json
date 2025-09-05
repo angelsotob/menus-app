@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "diarias": [
+    { "tipo": "conteo_categoria", "categoria": "verdura", "op": ">=", "cantidad": 2 },
+    { "tipo": "prohibir_alergeno", "alergeno": "gluten" }
+  ],
+  "semanales": [
+    { "tipo": "conteo_categoria", "categoria": "pescado", "op": ">=", "cantidad": 2 },
+    { "tipo": "no_repetir_item_consecutivo", "nombre": "salmón" }
+  ]
+}
