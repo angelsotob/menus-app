@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>PreferencesDialog</class>
+ <widget class="QDialog" name="PreferencesDialog">
+  <property name="windowTitle">
+   <string>Preferencias</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QFormLayout" name="formLayout">
+     <item row="0" column="0"><widget class="QLabel" name="lblDataDir"><property name="text"><string>Carpeta de datos</string></property></widget></item>
+     <item row="0" column="1">
+      <layout class="QHBoxLayout" name="layoutDataDir">
+       <item><widget class="QLineEdit" name="txtDataDir"><property name="readOnly"><bool>true</bool></property></widget></item>
+       <item><widget class="QPushButton" name="btnBrowseDataDir"><property name="text"><string>Cambiar…</string></property></widget></item>
+      </layout>
+     </item>
+     <item row="1" column="0"><widget class="QLabel" name="lblTheme"><property name="text"><string>Tema</string></property></widget></item>
+     <item row="1" column="1"><widget class="QComboBox" name="cmbTheme"/></item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Ok|QDialogButtonBox::Cancel</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

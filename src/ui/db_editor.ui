@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>DbEditor</class>
+ <widget class="QWidget" name="DbEditor">
+  <property name="windowTitle">
+   <string>Base de datos de alimentos</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QHBoxLayout" name="layoutFilters">
+     <item>
+      <widget class="QLineEdit" name="txtSearch">
+       <property name="placeholderText">
+        <string>Buscar alimento…</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="cmbCategory">
+       <property name="minimumWidth">
+        <number>160</number>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="chkShowInactive">
+       <property name="text">
+        <string>Mostrar inactivos</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="spacerFilters">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size><width>40</width><height>20</height></size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QTableView" name="tblFoods"/>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="layoutButtons">
+     <item>
+      <spacer name="spacerButtons">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size><width>40</width><height>20</height></size>
+       </property>
+      </spacer>
+     </item>
+     <item><widget class="QPushButton" name="btnAdd"><property name="text"><string>Añadir</string></property></widget></item>
+     <item><widget class="QPushButton" name="btnEdit"><property name="text"><string>Editar</string></property></widget></item>
+     <item><widget class="QPushButton" name="btnToggleActive"><property name="text"><string>Desactivar/Activar</string></property></widget></item>
+     <item><widget class="QPushButton" name="btnDelete"><property name="text"><string>Borrar</string></property></widget></item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

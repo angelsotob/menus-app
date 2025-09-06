@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>FoodDialog</class>
+ <widget class="QDialog" name="FoodDialog">
+  <property name="windowTitle">
+   <string>Alimento</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QFormLayout" name="formLayout">
+     <item row="0" column="0"><widget class="QLabel" name="lblName"><property name="text"><string>Nombre</string></property></widget></item>
+     <item row="0" column="1"><widget class="QLineEdit" name="txtName"/></item>
+
+     <item row="1" column="0"><widget class="QLabel" name="lblCategory"><property name="text"><string>Categoría</string></property></widget></item>
+     <item row="1" column="1"><widget class="QComboBox" name="cmbCategory"/></item>
+
+     <item row="2" column="0"><widget class="QLabel" name="lblTags"><property name="text"><string>Etiquetas (coma-sep)</string></property></widget></item>
+     <item row="2" column="1"><widget class="QLineEdit" name="txtTags"/></item>
+
+     <item row="3" column="0"><widget class="QLabel" name="lblNotes"><property name="text"><string>Notas</string></property></widget></item>
+     <item row="3" column="1"><widget class="QPlainTextEdit" name="txtNotes"/></item>
+
+     <item row="4" column="0"><widget class="QLabel" name="lblAllerg"><property name="text"><string>Alérgenos</string></property></widget></item>
+     <item row="4" column="1">
+      <widget class="QListWidget" name="lstAllergens">
+       <property name="selectionMode">
+        <enum>QAbstractItemView::MultiSelection</enum>
+       </property>
+       <property name="minimumHeight"><number>120</number></property>
+      </widget>
+     </item>
+
+     <item row="5" column="0"><widget class="QLabel" name="lblActive"><property name="text"><string>Activo</string></property></widget></item>
+     <item row="5" column="1"><widget class="QCheckBox" name="chkActive"><property name="checked"><bool>true</bool></property></widget></item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Ok|QDialogButtonBox::Cancel</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
