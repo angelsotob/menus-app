@@ -1,11 +1,27 @@
+/**
+ * @file .gitignore
+ * @brief Ignora archivos generados por el entorno de desarrollo,
+ *        cachés de Python, artefactos de build y resultados de ejecución.
+ */
+
+# --- Entorno virtual ---
 .venv/
+
+# --- Cachés de Python ---
 __pycache__/
 *.pyc
-*.spec
-dist/
+
+# --- Construcción y distribución ---
 build/
+dist/
+*.spec
+*.egg-info/
+
+# --- Cachés de herramientas ---
 .mypy_cache/
 .ruff_cache/
 .pytest_cache/
-# Packaging / metadata
-*.egg-info/
+
+# --- Resultados de ejecución (exports de PDF/imagenes/json) ---
+/outputs/
+/templates/

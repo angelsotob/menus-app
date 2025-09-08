@@ -2,27 +2,73 @@
 <ui version="4.0">
  <class>WeekPlanner</class>
  <widget class="QWidget" name="WeekPlanner">
-  <property name="windowTitle"><string>Planificador Semanal</string></property>
+  <property name="windowTitle">
+   <string>Planificador semanal</string>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QTabWidget" name="tabs">
-     <property name="tabPosition"><enum>QTabWidget::North</enum></property>
-     <widget class="QWidget" name="tabLunes"><attribute name="title"><string>Lunes</string></attribute></widget>
-     <widget class="QWidget" name="tabMartes"><attribute name="title"><string>Martes</string></attribute></widget>
-     <widget class="QWidget" name="tabMiercoles"><attribute name="title"><string>Miércoles</string></attribute></widget>
-     <widget class="QWidget" name="tabJueves"><attribute name="title"><string>Jueves</string></attribute></widget>
-     <widget class="QWidget" name="tabViernes"><attribute name="title"><string>Viernes</string></attribute></widget>
-     <widget class="QWidget" name="tabSabado"><attribute name="title"><string>Sábado</string></attribute></widget>
-     <widget class="QWidget" name="tabDomingo"><attribute name="title"><string>Domingo</string></attribute></widget>
+     <property name="tabPosition">
+      <enum>QTabWidget::North</enum>
+     </property>
+     <widget class="QWidget" name="tabLunes">
+      <attribute name="title">
+       <string>Lunes</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="layoutLunes"/>
+     </widget>
+     <widget class="QWidget" name="tabMartes">
+      <attribute name="title">
+       <string>Martes</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="layoutMartes"/>
+     </widget>
+     <widget class="QWidget" name="tabMiercoles">
+      <attribute name="title">
+       <string>Miércoles</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="layoutMiercoles"/>
+     </widget>
+     <widget class="QWidget" name="tabJueves">
+      <attribute name="title">
+       <string>Jueves</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="layoutJueves"/>
+     </widget>
+     <widget class="QWidget" name="tabViernes">
+      <attribute name="title">
+       <string>Viernes</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="layoutViernes"/>
+     </widget>
+     <widget class="QWidget" name="tabSabado">
+      <attribute name="title">
+       <string>Sábado</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="layoutSabado"/>
+     </widget>
+     <widget class="QWidget" name="tabDomingo">
+      <attribute name="title">
+       <string>Domingo</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="layoutDomingo"/>
+     </widget>
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout">
-     <item><spacer><property name="orientation"><enum>Qt::Horizontal</enum></property></spacer></item>
-     <item><widget class="QPushButton" name="btnLoadWeek"><property name="text"><string>Cargar semana…</string></property></widget></item>
-     <item><widget class="QPushButton" name="btnSaveWeek"><property name="text"><string>Guardar semana…</string></property></widget></item>
-     <item><widget class="QPushButton" name="btnExportWeekPdf"><property name="text"><string>Exportar PDF</string></property></widget></item>
-     <item><widget class="QPushButton" name="btnExportWeekImg"><property name="text"><string>Exportar Imagen</string></property></widget></item>
+    <layout class="QHBoxLayout" name="buttonRow">
+     <item>
+      <spacer name="spacer">
+       <property name="orientation"><enum>Qt::Horizontal</enum></property>
+       <property name="sizeHint" stdset="0">
+        <size><width>40</width><height>20</height></size>
+       </property>
+      </spacer>
+     </item>
+     <item><widget class="QPushButton" name="btnLoad"><property name="text"><string>Cargar semana</string></property></widget></item>
+     <item><widget class="QPushButton" name="btnSave"><property name="text"><string>Guardar semana</string></property></widget></item>
+     <item><widget class="QPushButton" name="btnExportPdf"><property name="text"><string>Exportar PDF</string></property></widget></item>
+     <item><widget class="QPushButton" name="btnExportImg"><property name="text"><string>Exportar Imagen</string></property></widget></item>
     </layout>
    </item>
   </layout>

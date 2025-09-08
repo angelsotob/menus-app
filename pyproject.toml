@@ -1,9 +1,19 @@
 [tool.black]
 line-length = 100
 target-version = ["py312"]
+include = '\.pyi?$'
+force-exclude = '''
+/(
+    \.venv
+  | build
+  | dist
+)/
+'''
+
 
 [tool.ruff]
 line-length = 100
+src = ["src", "tests"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP"]
