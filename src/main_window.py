@@ -27,6 +27,8 @@ class MainWindow:
         act_allergens = self.ui.findChild(QAction, "actionAllergensEditor")
         act_prefs = self.ui.findChild(QAction, "actionPreferences")
         act_about = self.ui.findChild(QAction, "actionAbout")
+        act_day = self.ui.findChild(QAction, "actionOpenDayEditor")
+        act_week = self.ui.findChild(QAction, "actionOpenWeekPlanner")
 
         if act_exit:
             act_exit.triggered.connect(self.ui.close)
@@ -38,6 +40,10 @@ class MainWindow:
             act_prefs.triggered.connect(self.open_preferences)
         if act_about:
             act_about.triggered.connect(self.show_about)
+        if act_day:
+            act_day.triggered.connect(self.open_day_editor)
+        if act_week:
+            act_week.triggered.connect(self.open_week_planner)
 
         # Stacked central
         self.stack: QStackedWidget | None = self.ui.findChild(QStackedWidget, "stack")
@@ -83,3 +89,15 @@ class MainWindow:
 
     def show(self) -> None:
         self.ui.show()
+
+    def open_day_editor(self) -> None:
+        from widgets.day_editor import DayEditor
+
+        w = DayEditor(self.repo, parent=self.ui)
+        self._push_central_widget(w)
+
+    def open_week_planner(self) -> None:
+        from widgets.week_planner import WeekPlanner
+
+        w = WeekPlanner(self.repo, parent=self.ui)
+        self._push_central_widget(w)
