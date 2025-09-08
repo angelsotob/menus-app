@@ -1,0 +1,20 @@
+{
+  "fecha": "2025-09-08",
+  "comidas": {
+    "desayuno": [
+      "food_5208b819"
+    ],
+    "media_manana": [
+      "food_80df9743"
+    ],
+    "comida": [
+      "food_834c34e3"
+    ],
+    "merienda": [
+      "food_80df9743"
+    ],
+    "cena": [
+      "food_eb21e937"
+    ]
+  }
+}
