@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from collections.abc import Iterable
 from dataclasses import dataclass
+from datetime import date
 from pathlib import Path
 
 from PySide6.QtCore import Qt
@@ -235,28 +236,28 @@ class DayEditor(QWidget):
         )
 
     def _save_day(self) -> None:
+        today_code = date.today().strftime("%Y%m%d")
+        templates = Path.cwd() / "templates"
+        templates.mkdir(parents=True, exist_ok=True)
+        default_path = templates / f"menu_dia_{today_code}.json"
+
         fn, _ = QFileDialog.getSaveFileName(
-            self, "Guardar día", "menu_dia.day.menu.json", "JSON (*.json)"
+            self, "Guardar día", str(default_path), "JSON (*.json)"
         )
         if not fn:
             return
 
-        # Garantiza extensión .json
         path = Path(fn)
         if path.suffix.lower() != ".json":
             path = path.with_suffix(".json")
 
-        from datetime import date
-
         dm = self.to_day_meals()
         menu = DayMenu(fecha=date.today(), comidas=dm)
 
-        # JSON serializable (convierte date a str ISO)
         data = menu.model_dump(mode="json")
         text = json.dumps(data, indent=2, ensure_ascii=False)
         path.write_text(text, encoding="utf-8")
 
-        # (Opcional) Persistir también en el data dir interno vía Repo
         try:
             self.repo.save_day_menu(menu, path.stem)
         except Exception:
@@ -265,7 +266,12 @@ class DayEditor(QWidget):
         QMessageBox.information(self, "Guardado", f"Menú diario guardado en:\n{path}")
 
     def _load_day(self) -> None:
-        fn, _ = QFileDialog.getOpenFileName(self, "Cargar día", "", "JSON (*.json)")
+        templates = Path.cwd() / "templates"
+        templates.mkdir(parents=True, exist_ok=True)
+
+        fn, _ = QFileDialog.getOpenFileName(
+            self, "Cargar día", str(templates), "JSON (*.json)"
+        )
         if not fn:
             return
 
@@ -295,21 +301,29 @@ class DayEditor(QWidget):
         print_view = DayPrintView(self._foods_by_id, day, parent=None)
         print_view.resize(1000, 600)
 
+        today_code = date.today().strftime("%Y%m%d")
+        outputs = Path.cwd() / "outputs"
+        outputs.mkdir(parents=True, exist_ok=True)
+
         if kind == "pdf":
-            fn, _ = QFileDialog.getSaveFileName(self, "Exportar PDF", "menu_dia.pdf", "PDF (*.pdf)")
+            default_path = outputs / f"menu_dia_{today_code}.pdf"
+            fn, _ = QFileDialog.getSaveFileName(
+                self, "Exportar PDF", str(default_path), "PDF (*.pdf)"
+            )
             if not fn:
                 return
             export_widget_to_pdf(print_view, fn)
-            QMessageBox.information(self, "Exportado", "Exportado a PDF.")
+            QMessageBox.information(self, "Exportado", f"Exportado a PDF:\n{fn}")
         else:
+            default_path = outputs / f"menu_dia_{today_code}.png"
             fn, _ = QFileDialog.getSaveFileName(
                 self,
                 "Exportar Imagen",
-                "menu_dia.png",
+                str(default_path),
                 "PNG (*.png);;JPEG (*.jpg)",
             )
             if not fn:
                 return
             fmt = "PNG" if fn.lower().endswith(".png") else "JPG"
             export_widget_to_image(print_view, fn, fmt=fmt, scale=2.0)
-            QMessageBox.information(self, "Exportado", "Exportado a imagen.")
+            QMessageBox.information(self, "Exportado", f"Exportado a imagen:\n{fn}")
