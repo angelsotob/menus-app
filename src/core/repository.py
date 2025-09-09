@@ -12,6 +12,7 @@ from core.models import DayMenu, Food, WeekMenu
 class Repo:
     def __init__(self, root: Path | None = None):
         self.root = root or ensure_data_dir()
+        (self.root / "backups").mkdir(parents=True, exist_ok=True)
 
     # ---------- utilidades ----------
     def _file(self, name: str) -> Path:
@@ -24,10 +25,9 @@ class Repo:
         return json.loads(p.read_text(encoding="utf-8"))
 
     def _atomic_write(self, path: Path, data: dict) -> None:
-        # backup si existe
         if path.exists():
+            (self.root / "backups").mkdir(parents=True, exist_ok=True)
             shutil.copy2(path, self.root / "backups" / f"{path.stem}.bak.json")
-        # escritura atómica
         fd, tmp_name = tempfile.mkstemp(prefix=path.stem, suffix=".tmp", dir=str(self.root))
         tmp = Path(tmp_name)
         tmp.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -50,7 +50,7 @@ class Repo:
     def save_allergens(self, allergens: list[str]) -> None:
         self._atomic_write(self._file("alergenos.json"), {"version": 1, "alergenos": allergens})
 
-    # ---------- reglas (solo persistencia) ----------
+    # ---------- reglas ----------
     def load_rules(self) -> dict:
         return self._read_json("reglas.json")
 
@@ -68,3 +68,86 @@ class Repo:
             "dias": {k: v.model_dump() for k, v in menu.dias.items()},
         }
         self._atomic_write(self._file(f"{name}.week.menu.json"), d)
+
+    # ---------- categorías ----------
+    def _ensure_categories_file(self) -> Path:
+        p = self._file("categorias.json")
+        if not p.exists():
+            default = {
+                "version": 1,
+                "categorias": [
+                    "proteina",
+                    "pescado",
+                    "marisco",
+                    "verdura",
+                    "fruta",
+                    "legumbre",
+                    "cereal_harina",
+                    "lacteo",
+                    "otros",
+                ],
+                "por_comida": {
+                    "desayuno": ["cereal_harina", "lacteo", "fruta", "otros"],
+                    "media_manana": ["fruta", "proteina", "otros"],
+                    "comida": ["proteina", "verdura", "cereal_harina", "legumbre", "otros"],
+                    "merienda": ["fruta", "lacteo", "otros"],
+                    "cena": ["pescado", "proteina", "verdura", "otros"],
+                },
+            }
+            self._atomic_write(p, default)
+        return p
+
+    def load_categories_config(self) -> dict:
+        p = self._ensure_categories_file()
+        return json.loads(p.read_text(encoding="utf-8"))
+
+    def save_categories_config(self, cfg: dict) -> None:
+        self._atomic_write(self._ensure_categories_file(), cfg)
+
+    def list_categories(self) -> list[str]:
+        cfg = self.load_categories_config()
+        cats = list(cfg.get("categorias", []))
+        if not cats:
+            cats = sorted({f.categoria for f in self.list_foods()})
+        return cats
+
+    def default_cats_for(self, meal_key: str) -> list[str]:
+        cfg = self.load_categories_config()
+        por = cfg.get("por_comida", {})
+        cats = por.get(meal_key, [])
+        if not cats:
+            cats = ["otros"] if "otros" in self.list_categories() else self.list_categories()
+        return cats
+
+    # ---------- sincronización categorías <-> alimentos ----------
+    def rename_category_in_foods(self, old: str, new: str) -> int:
+        """Reasigna en alimentos la categoría old -> new. Devuelve nº de alimentos modificados."""
+        foods = self.list_foods()
+        count = 0
+        for f in foods:
+            if f.categoria == old:
+                f.categoria = new  # type: ignore[assignment]
+                count += 1
+        if count:
+            self.save_foods(foods)
+        return count
+
+    def remap_deleted_category(self, deleted: str, fallback: str = "otros") -> int:
+        """
+        Cuando borras una categoría, mueve los alimentos con esa categoría a
+        'fallback' (si existe).
+
+        Si `fallback` no existe en categorias.json, no remapea (devuelve 0).
+        """
+        cats = set(self.list_categories())
+        if fallback not in cats:
+            return 0
+        foods = self.list_foods()
+        count = 0
+        for f in foods:
+            if f.categoria == deleted:
+                f.categoria = fallback  # type: ignore[assignment]
+                count += 1
+        if count:
+            self.save_foods(foods)
+        return count

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 
-from PySide6.QtCore import QSortFilterProxyModel, Qt
+from PySide6.QtCore import QItemSelectionModel, QSortFilterProxyModel, Qt
 from PySide6.QtGui import QAction, QKeySequence
 from PySide6.QtWidgets import (
     QAbstractItemView,
@@ -75,6 +75,39 @@ class DbEditor(QWidget):
         self._install_shortcuts()
 
         self._apply_filters()
+
+    # ---- público: refrescar desde repo (tras cambios externos) ----
+    def refresh_from_repo(self, keep_selection: bool = True) -> None:
+        """Relee alimentos del repo, actualiza modelo y reaplica filtros.
+        Mantiene selección previa si es posible."""
+        selected_id: str | None = None
+        if keep_selection:
+            row = self._current_source_row()
+            if row is not None:
+                try:
+                    selected_id = self.model.current_food(row).id
+                except Exception:
+                    selected_id = None
+
+        foods = self.repo.list_foods()
+        self.model.set_rows(foods)
+        self._apply_filters()
+
+        # re-seleccionar por id si procede
+        if keep_selection and selected_id:
+            try:
+                src_row = next(i for i, f in enumerate(self.model._rows) if f.id == selected_id)  # type: ignore[attr-defined]
+                src_index = self.model.index(src_row, 0)
+                proxy_index = self.proxy.mapFromSource(src_index)
+                if proxy_index.isValid():
+                    sel_model = self.ui.tblFoods.selectionModel()
+                    sel_model.clearSelection()
+                    sel_model.select(
+                        proxy_index, QItemSelectionModel.Select | QItemSelectionModel.Rows
+                    )
+                    self.ui.tblFoods.setCurrentIndex(proxy_index)
+            except StopIteration:
+                pass
 
     # ---- atajos ----
     def _install_shortcuts(self) -> None:

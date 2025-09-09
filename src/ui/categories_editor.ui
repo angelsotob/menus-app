@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>CategoriesEditor</class>
+ <widget class="QDialog" name="CategoriesEditor">
+  <property name="windowTitle">
+   <string>Categorías</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QHBoxLayout" name="mainRow">
+     <!-- Columna izquierda: categorías globales -->
+     <item>
+      <layout class="QVBoxLayout" name="leftCol">
+       <item><widget class="QLabel" name="lblGlobal"><property name="text"><string>Categorías globales</string></property></widget></item>
+       <item><widget class="QListWidget" name="lstGlobalCats"/></item>
+       <item>
+        <layout class="QHBoxLayout" name="rowNew">
+         <item><widget class="QLineEdit" name="txtNewCat"><property name="placeholderText"><string>Nueva / renombrar…</string></property></widget></item>
+         <item><widget class="QPushButton" name="btnAddCat"><property name="text"><string>Añadir</string></property></widget></item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="rowActions">
+         <item><widget class="QPushButton" name="btnRenameCat"><property name="text"><string>Renombrar</string></property></widget></item>
+         <item><widget class="QPushButton" name="btnDeleteCat"><property name="text"><string>Eliminar</string></property></widget></item>
+        </layout>
+       </item>
+      </layout>
+     </item>
+
+     <!-- Separador -->
+     <item>
+      <widget class="QFrame" name="sep">
+       <property name="frameShape"><enum>QFrame::VLine</enum></property>
+       <property name="frameShadow"><enum>QFrame::Sunken</enum></property>
+      </widget>
+     </item>
+
+     <!-- Columna derecha: mapeo por comida -->
+     <item>
+      <layout class="QVBoxLayout" name="rightCol">
+       <item><widget class="QLabel" name="lblMeal"><property name="text"><string>Sugerencias por comida</string></property></widget></item>
+
+       <item>
+        <layout class="QHBoxLayout" name="rowMealSel">
+         <item><widget class="QLabel" name="lblMealSel"><property name="text"><string>Comida:</string></property></widget></item>
+         <item><widget class="QComboBox" name="cmbMeal"/></item>
+        </layout>
+       </item>
+
+       <item><widget class="QListWidget" name="lstMealCats"/></item>
+
+       <item>
+        <layout class="QHBoxLayout" name="rowAddFromGlobal">
+         <item><widget class="QComboBox" name="cmbFromGlobal"/></item>
+         <item><widget class="QPushButton" name="btnAddToMeal"><property name="text"><string>Añadir a comida</string></property></widget></item>
+        </layout>
+       </item>
+
+       <item>
+        <layout class="QHBoxLayout" name="rowMealButtons">
+         <item><widget class="QPushButton" name="btnRemoveFromMeal"><property name="text"><string>Quitar</string></property></widget></item>
+         <item><widget class="QPushButton" name="btnMoveUp"><property name="text"><string>Subir</string></property></widget></item>
+         <item><widget class="QPushButton" name="btnMoveDown"><property name="text"><string>Bajar</string></property></widget></item>
+        </layout>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

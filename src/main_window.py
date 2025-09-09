@@ -16,10 +16,9 @@ class MainWindow:
         self.ui.setWindowTitle("MenusApp — Base de datos")
         self.repo = Repo(ensure_data_dir())
 
-        # --- Asegura que hay status bar (pónlo justo después de cargar self.ui) ---
+        # Asegura status bar
         if self.ui.statusBar() is None:
             self.ui.setStatusBar(QStatusBar(self.ui))
-        # ----------------------------------------------------------------------------
 
         # Acciones de menú
         act_exit = self.ui.findChild(QAction, "actionExit")
@@ -29,6 +28,7 @@ class MainWindow:
         act_about = self.ui.findChild(QAction, "actionAbout")
         act_day = self.ui.findChild(QAction, "actionOpenDayEditor")
         act_week = self.ui.findChild(QAction, "actionOpenWeekPlanner")
+        act_cats = self.ui.findChild(QAction, "actionCategoriesEditor")
 
         if act_exit:
             act_exit.triggered.connect(self.ui.close)
@@ -44,6 +44,8 @@ class MainWindow:
             act_day.triggered.connect(self.open_day_editor)
         if act_week:
             act_week.triggered.connect(self.open_week_planner)
+        if act_cats:
+            act_cats.triggered.connect(self.open_categories_editor)
 
         # Stacked central
         self.stack: QStackedWidget | None = self.ui.findChild(QStackedWidget, "stack")
@@ -60,10 +62,39 @@ class MainWindow:
             self.ui.setCentralWidget(w)
 
     def _status(self, msg: str, ms: int = 2500) -> None:
-        # llamado por DbEditor para mostrar mensajes
         sb = self.ui.statusBar()
         if sb is not None:
             sb.showMessage(msg, ms)
+
+    def _find_db_editor(self):
+        """Devuelve la instancia de DbEditor en el stack si existe, o None."""
+        if self.stack is None:
+            cw = self.ui.centralWidget()
+            if cw is None:
+                return None
+            try:
+                from widgets.db_editor import DbEditor  # import diferido
+
+                return cw if isinstance(cw, DbEditor) else None
+            except Exception:
+                return None
+
+        # Buscar en los widgets del stack
+        try:
+            from widgets.db_editor import DbEditor  # import diferido
+        except Exception:
+            return None
+
+        for i in range(self.stack.count()):
+            w = self.stack.widget(i)
+            if isinstance(w, DbEditor):
+                return w
+        return None
+
+    def _refresh_db_editor(self) -> None:
+        ed = self._find_db_editor()
+        if ed is not None:
+            ed.refresh_from_repo(keep_selection=True)
 
     # ---------- slots ----------
     def open_db_editor(self) -> None:
@@ -101,3 +132,19 @@ class MainWindow:
 
         w = WeekPlanner(self.repo, parent=self.ui)
         self._push_central_widget(w)
+
+    def open_categories_editor(self) -> None:
+        from widgets.categories_editor import CategoriesEditor
+
+        dlg = CategoriesEditor(self.repo, self.ui)
+
+        # Conecta la señal para refrescar alimentos si hubo cambios que les afecten
+        try:
+            dlg.categories_changed.connect(lambda affected: self._refresh_db_editor())
+        except Exception:
+            pass
+
+        if dlg.exec():
+            # Refresca igualmente por si solo cambió el orden/listas sugeridas
+            self._refresh_db_editor()
+            QMessageBox.information(self.ui, "Categorías", "Categorías actualizadas.")

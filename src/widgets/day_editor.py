@@ -31,15 +31,6 @@ from widgets.print_views import DayPrintView
 ROLE_CAT = Qt.UserRole + 1
 ROLE_FID = Qt.UserRole + 2
 
-# Categorías sugeridas por comida
-DEFAULT_CATS = {
-    "desayuno": ["cereal_harina", "lacteo", "fruta", "otros"],
-    "media_manana": ["fruta", "proteina", "otros"],
-    "comida": ["proteina", "verdura", "cereal_harina", "legumbre", "otros"],
-    "merienda": ["fruta", "lacteo", "otros"],
-    "cena": ["pescado", "proteina", "verdura", "otros"],
-}
-
 
 @dataclass
 class MealItem:
@@ -55,20 +46,22 @@ class PickFoodDialog(QDialog):
     def __init__(
         self,
         repo: Repo,
-        cats: list[str],
+        meal_key: str,
         parent=None,
         current: MealItem | None = None,
     ) -> None:
         super().__init__(parent)
         self.setWindowTitle("Seleccionar alimento")
         self.repo = repo
+        self.meal_key = meal_key
         self.result_item: MealItem | None = None
 
         layout = QVBoxLayout(self)
         form = QFormLayout()
         self.cmbCat = QComboBox()
         self.cmbFood = QComboBox()
-        self.cmbCat.addItems(cats)
+        # Categorías sugeridas desde categorias.json
+        self.cmbCat.addItems(self.repo.default_cats_for(meal_key))
         form.addRow(QLabel("Categoría:"), self.cmbCat)
         form.addRow(QLabel("Alimento:"), self.cmbFood)
         layout.addLayout(form)
@@ -192,8 +185,7 @@ class DayEditor(QWidget):
             lst.addItem(li)
 
     def _pick(self, meal_key: str, current: MealItem | None = None) -> MealItem | None:
-        cats = DEFAULT_CATS.get(meal_key, ["otros"])
-        dlg = PickFoodDialog(self.repo, cats, self, current)
+        dlg = PickFoodDialog(self.repo, meal_key, self, current)
         if dlg.exec():
             return dlg.result_item
         return None
@@ -241,9 +233,7 @@ class DayEditor(QWidget):
         templates.mkdir(parents=True, exist_ok=True)
         default_path = templates / f"menu_dia_{today_code}.json"
 
-        fn, _ = QFileDialog.getSaveFileName(
-            self, "Guardar día", str(default_path), "JSON (*.json)"
-        )
+        fn, _ = QFileDialog.getSaveFileName(self, "Guardar día", str(default_path), "JSON (*.json)")
         if not fn:
             return
 
@@ -269,9 +259,7 @@ class DayEditor(QWidget):
         templates = Path.cwd() / "templates"
         templates.mkdir(parents=True, exist_ok=True)
 
-        fn, _ = QFileDialog.getOpenFileName(
-            self, "Cargar día", str(templates), "JSON (*.json)"
-        )
+        fn, _ = QFileDialog.getOpenFileName(self, "Cargar día", str(templates), "JSON (*.json)")
         if not fn:
             return
 

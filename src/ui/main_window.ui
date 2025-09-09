@@ -31,6 +31,7 @@
     <addaction name="actionAllergensEditor"/>
     <addaction name="actionOpenDayEditor"/>
     <addaction name="actionOpenWeekPlanner"/>
+    <addaction name="actionCategoriesEditor"/>
    </widget>
 
    <widget class="QMenu" name="menuPreferencias">
@@ -62,6 +63,9 @@
   </action>
   <action name="actionOpenWeekPlanner">
    <property name="text"><string>Planificador semanal</string></property>
+  </action>
+  <action name="actionCategoriesEditor">
+  <property name="text"><string>Categorías</string></property>
   </action>
   <action name="actionPreferences">
    <property name="text"><string>Preferencias</string></property>
