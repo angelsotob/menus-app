@@ -17,6 +17,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.4.1] - 2025-09-10
+### Added
+- Categories editor (global + per-meal) con persistencia en `categorias.json`.
+- Integración con FoodDialog/DbEditor y planners (Day/Week) leyendo mapeos desde repo.
+
+### Changed
+- Remapeo automático de alimentos al renombrar/borrar categorías.
+- Export routes por defecto a `/outputs/` y plantillas a `/templates/`.
+
+### Fixed
+- Ordenación real en la tabla (proxy model).
+
+---
+
 ## [0.4.0] - 2025-09-09
 ### Added
 - **Week planner (Planificador semanal)**:
@@ -77,7 +91,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## License
 This project is licensed under **CC BY-NC 4.0**.
 
-[Unreleased]: https://github.com/angelsotob/menus-app/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/OWNER/REPO/compare/v0.4.1...HEAD
+[0.4.1]: https://github.com/OWNER/REPO/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/angelsotob/menus-app/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/angelsotob/menus-app/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/angelsotob/menus-app/compare/v0.1.0...v0.2.0
