@@ -1,9 +1,3 @@
-/**
- * @file .gitignore
- * @brief Ignora archivos generados por el entorno de desarrollo,
- *        cachés de Python, artefactos de build y resultados de ejecución.
- */
-
 # --- Entorno virtual ---
 .venv/
 

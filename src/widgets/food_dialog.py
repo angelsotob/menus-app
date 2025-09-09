@@ -18,38 +18,29 @@ class FoodDialog(QDialog):
         self.repo = repo
         self.result_food: Food | None = None
 
-        # categorías
-        self.ui.cmbCategory.addItems(
-            [
-                "proteina",
-                "verdura",
-                "fruta",
-                "cereal_harina",
-                "legumbre",
-                "pescado",
-                "marisco",
-                "huevo",
-                "lacteo",
-                "frutos_secos",
-                "grasa",
-                "otros",
-            ]
-        )
+        # categorías (dinámicas desde categorias.json)
+        cats = self.repo.list_categories()
+        self.ui.cmbCategory.clear()
+        self.ui.cmbCategory.addItems(cats)
+
         # alérgenos
+        self.ui.lstAllergens.clear()
         for a in self.repo.list_allergens():
             self.ui.lstAllergens.addItem(a)
 
         if current:
             self.ui.txtName.setText(current.nombre)
+            # seleccionar categoría correspondiente (si ya no existe, se queda en 0)
             idx = self.ui.cmbCategory.findText(current.categoria)
             self.ui.cmbCategory.setCurrentIndex(max(0, idx))
             self.ui.txtTags.setText(", ".join(current.etiquetas))
             self.ui.txtNotes.setPlainText(current.notas or "")
             self.ui.chkActive.setChecked(current.activo)
             # selección de alérgenos
+            cur_all = set(current.alergenos)
             for i in range(self.ui.lstAllergens.count()):
                 item = self.ui.lstAllergens.item(i)
-                item.setSelected(item.text() in set(current.alergenos))
+                item.setSelected(item.text() in cur_all)
             self._id = current.id
         else:
             self._id = f"food_{uuid.uuid4().hex[:8]}"
@@ -62,7 +53,8 @@ class FoodDialog(QDialog):
         if not nombre:
             self.ui.txtName.setFocus()
             return
-        categoria = self.ui.cmbCategory.currentText()
+
+        categoria = self.ui.cmbCategory.currentText().strip()
         etiquetas = [t.strip() for t in self.ui.txtTags.text().split(",") if t.strip()]
         notas = self.ui.txtNotes.toPlainText().strip() or None
         sel_allergens = [i.text() for i in self.ui.lstAllergens.selectedItems()]
@@ -71,7 +63,7 @@ class FoodDialog(QDialog):
         self.result_food = Food(
             id=self._id,
             nombre=nombre,
-            categoria=categoria,  # type: ignore[arg-type]
+            categoria=categoria,  # ahora es str, no Literal
             alergenos=sel_allergens,
             etiquetas=etiquetas,
             notas=notas,

@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "categorias": [
+    "Proteina",
+    "Pescado",
+    "Marisco",
+    "Verdura",
+    "Fruta",
+    "Legumbre",
+    "Cereales",
+    "Lacteo",
+    "Otros"
+  ],
+  "por_comida": {
+    "desayuno": ["cereal_harina", "lacteo", "fruta", "otros"],
+    "media_manana": ["fruta", "proteina", "otros"],
+    "comida": ["proteina", "verdura", "cereal_harina", "legumbre", "otros"],
+    "merienda": ["fruta", "lacteo", "otros"],
+    "cena": ["pescado", "proteina", "verdura", "otros"]
+  }
+}

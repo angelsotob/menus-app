@@ -119,9 +119,7 @@ class WeekPlanner(QWidget):
         templates = Path.cwd() / "templates"
         templates.mkdir(parents=True, exist_ok=True)
 
-        fn, _ = QFileDialog.getOpenFileName(
-            self, "Cargar semana", str(templates), "JSON (*.json)"
-        )
+        fn, _ = QFileDialog.getOpenFileName(self, "Cargar semana", str(templates), "JSON (*.json)")
         if not fn:
             return
         data = json.loads(Path(fn).read_text(encoding="utf-8"))
