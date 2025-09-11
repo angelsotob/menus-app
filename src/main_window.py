@@ -3,7 +3,7 @@ from __future__ import annotations
 from PySide6.QtGui import QAction
 from PySide6.QtWidgets import QMainWindow, QMessageBox, QStackedWidget, QStatusBar, QWidget
 
-from core.config import ensure_data_dir
+from core.config import ensure_profile_root, get_selected_profile
 from core.repository import Repo
 from ui import load_ui
 
@@ -13,8 +13,8 @@ class MainWindow:
 
     def __init__(self) -> None:
         self.ui: QMainWindow = load_ui("main_window.ui")  # es un QMainWindow
-        self.ui.setWindowTitle("MenusApp — Base de datos")
-        self.repo = Repo(ensure_data_dir())
+        self.repo = Repo(ensure_profile_root())
+        self.ui.setWindowTitle(self._title_with_profile())
 
         # Asegura status bar
         if self.ui.statusBar() is None:
@@ -66,39 +66,53 @@ class MainWindow:
         if sb is not None:
             sb.showMessage(msg, ms)
 
-    def _find_db_editor(self):
-        """Devuelve la instancia de DbEditor en el stack si existe, o None."""
-        if self.stack is None:
-            cw = self.ui.centralWidget()
-            if cw is None:
-                return None
-            try:
-                from widgets.db_editor import DbEditor  # import diferido
+    def _title_with_profile(self) -> str:
+        prof = get_selected_profile() or "-"
+        return f"MenusApp — Perfil: {prof}"
 
-                return cw if isinstance(cw, DbEditor) else None
-            except Exception:
-                return None
+    def _switch_profile(self) -> None:
+        """Reinstancia el Repo al perfil activo y refresca vistas abiertas."""
+        self.repo = Repo(ensure_profile_root())
+        self.ui.setWindowTitle(self._title_with_profile())
 
-        # Buscar en los widgets del stack
+        # Refrescar el widget activo si soporta set_repo/refresh
+        cw = self.ui.centralWidget() if self.stack is None else self.stack.currentWidget()
+        if cw is None:
+            return
+
+        # DbEditor
         try:
-            from widgets.db_editor import DbEditor  # import diferido
+            from widgets.db_editor import DbEditor
+
+            if isinstance(cw, DbEditor):
+                cw.refresh_from_repo(self.repo, keep_selection=False)
+                return
         except Exception:
-            return None
+            pass
 
-        for i in range(self.stack.count()):
-            w = self.stack.widget(i)
-            if isinstance(w, DbEditor):
-                return w
-        return None
+        # DayEditor
+        try:
+            from widgets.day_editor import DayEditor
 
-    def _refresh_db_editor(self) -> None:
-        ed = self._find_db_editor()
-        if ed is not None:
-            ed.refresh_from_repo(keep_selection=True)
+            if isinstance(cw, DayEditor):
+                cw.set_repo(self.repo)
+                return
+        except Exception:
+            pass
+
+        # WeekPlanner
+        try:
+            from widgets.week_planner import WeekPlanner
+
+            if isinstance(cw, WeekPlanner):
+                cw.set_repo(self.repo)
+                return
+        except Exception:
+            pass
 
     # ---------- slots ----------
     def open_db_editor(self) -> None:
-        from widgets.db_editor import DbEditor  # import diferido
+        from widgets.db_editor import DbEditor
 
         w = DbEditor(self.repo, parent=self.ui, notify=self._status)
         self._push_central_widget(w)
@@ -113,10 +127,14 @@ class MainWindow:
         from widgets.preferences import PreferencesDialog
 
         dlg = PreferencesDialog(self.repo, self.ui)
-        dlg.exec()
+        # recarga ON THE GO cuando cambie/cree perfil
+        dlg.profile_changed.connect(lambda *_: self._switch_profile())
+        if dlg.exec():
+            # por si el cambio se aplicó al pulsar OK
+            self._switch_profile()
 
     def show_about(self) -> None:
-        QMessageBox.information(self.ui, "Acerca de", "MenusApp — Editor de Base de Datos")
+        QMessageBox.information(self.ui, "Acerca de", "MenusApp — Preferencias y Perfiles")
 
     def show(self) -> None:
         self.ui.show()
@@ -137,14 +155,5 @@ class MainWindow:
         from widgets.categories_editor import CategoriesEditor
 
         dlg = CategoriesEditor(self.repo, self.ui)
-
-        # Conecta la señal para refrescar alimentos si hubo cambios que les afecten
-        try:
-            dlg.categories_changed.connect(lambda affected: self._refresh_db_editor())
-        except Exception:
-            pass
-
         if dlg.exec():
-            # Refresca igualmente por si solo cambió el orden/listas sugeridas
-            self._refresh_db_editor()
-            QMessageBox.information(self.ui, "Categorías", "Categorías actualizadas.")
+            self._status("Categorías actualizadas", 2500)

@@ -6,6 +6,7 @@ from pathlib import Path
 
 from PySide6.QtWidgets import QFileDialog, QMessageBox, QVBoxLayout, QWidget
 
+from core.config import get_selected_profile
 from core.export_qt import export_widget_to_image, export_widget_to_pdf
 from core.models import WeekMenu
 from core.repository import Repo
@@ -26,18 +27,24 @@ TAB_LAYOUT_NAMES = [
 
 
 def monday_of(d: date) -> date:
-    # Monday as start of week: 0 = Monday
+    """Devuelve el lunes de la semana de d."""
     return d - timedelta(days=d.weekday())
+
+
+def _profile_tag() -> str:
+    p = get_selected_profile() or "default"
+    safe = "".join(c for c in p if c.isalnum() or c in "-_").strip()
+    return safe or "default"
 
 
 class WeekPlanner(QWidget):
     def __init__(self, repo: Repo, parent=None) -> None:
         super().__init__(parent)
         self.ui = load_ui("week_planner.ui")
-        self.setLayout(self.ui.layout())  # adopt layout from .ui
+        self.setLayout(self.ui.layout())  # adopta el layout del .ui
         self.repo = repo
 
-        # Prepara un DayEditor por pestaña
+        # Un DayEditor por pestaña
         self._editors: dict[str, DayEditor] = {}
         for key, layout_name in zip(DAY_KEYS, TAB_LAYOUT_NAMES):
             lay: QVBoxLayout = getattr(self.ui, layout_name)
@@ -89,16 +96,18 @@ class WeekPlanner(QWidget):
     def _save_week(self) -> None:
         start = monday_of(date.today())
         code = start.strftime("%Y%m%d")
+        profile = _profile_tag()
 
         templates = Path.cwd() / "templates"
         templates.mkdir(parents=True, exist_ok=True)
-        default_path = templates / f"menu_semana_{code}.json"
+        default_path = templates / f"menu_semana_{profile}_{code}.json"
 
         fn, _ = QFileDialog.getSaveFileName(
             self, "Guardar semana", str(default_path), "JSON (*.json)"
         )
         if not fn:
             return
+
         path = Path(fn)
         if path.suffix.lower() != ".json":
             path = path.with_suffix(".json")
@@ -108,6 +117,7 @@ class WeekPlanner(QWidget):
         text = json.dumps(data, indent=2, ensure_ascii=False)
         path.write_text(text, encoding="utf-8")
 
+        # Opcional: persistir también alguna referencia interna
         try:
             self.repo.save_rules({"last_saved_week": str(path)})
         except Exception:
@@ -122,6 +132,7 @@ class WeekPlanner(QWidget):
         fn, _ = QFileDialog.getOpenFileName(self, "Cargar semana", str(templates), "JSON (*.json)")
         if not fn:
             return
+
         data = json.loads(Path(fn).read_text(encoding="utf-8"))
         dias = data.get("dias", {})
 
@@ -148,12 +159,13 @@ class WeekPlanner(QWidget):
 
         start = wm.semana_inicio
         code = start.strftime("%Y%m%d")
+        profile = _profile_tag()
 
         outputs = Path.cwd() / "outputs"
         outputs.mkdir(parents=True, exist_ok=True)
 
         if kind == "pdf":
-            default_path = outputs / f"menu_semana_{code}.pdf"
+            default_path = outputs / f"menu_semana_{profile}_{code}.pdf"
             fn, _ = QFileDialog.getSaveFileName(
                 self, "Exportar PDF (semana)", str(default_path), "PDF (*.pdf)"
             )
@@ -162,7 +174,7 @@ class WeekPlanner(QWidget):
             export_widget_to_pdf(print_view, fn)
             QMessageBox.information(self, "Exportado", f"Semana exportada a PDF:\n{fn}")
         else:
-            default_path = outputs / f"menu_semana_{code}.png"
+            default_path = outputs / f"menu_semana_{profile}_{code}.png"
             fn, _ = QFileDialog.getSaveFileName(
                 self,
                 "Exportar Imagen (semana)",
