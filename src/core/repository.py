@@ -121,7 +121,6 @@ class Repo:
 
     # ---------- sincronización categorías <-> alimentos ----------
     def rename_category_in_foods(self, old: str, new: str) -> int:
-        """Reasigna en alimentos la categoría old -> new. Devuelve nº de alimentos modificados."""
         foods = self.list_foods()
         count = 0
         for f in foods:
@@ -135,9 +134,7 @@ class Repo:
     def remap_deleted_category(self, deleted: str, fallback: str = "otros") -> int:
         """
         Cuando borras una categoría, mueve los alimentos con esa categoría a
-        'fallback' (si existe).
-
-        Si `fallback` no existe en categorias.json, no remapea (devuelve 0).
+        'fallback' (si existe). Si no existe, no remapea (devuelve 0).
         """
         cats = set(self.list_categories())
         if fallback not in cats:

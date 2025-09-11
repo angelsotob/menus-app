@@ -21,11 +21,20 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from core.config import get_selected_profile
 from core.export_qt import export_widget_to_image, export_widget_to_pdf
 from core.models import DayMeals, DayMenu, Food
 from core.repository import Repo
 from ui import load_ui
 from widgets.print_views import DayPrintView
+
+
+def _profile_tag() -> str:
+    p = get_selected_profile() or "default"
+    # filename-safe: solo alfanumérico, guion y guion bajo
+    safe = "".join(c for c in p if c.isalnum() or c in "-_").strip()
+    return safe or "default"
+
 
 # Roles de usuario para guardar datos en QListWidgetItem (evitar colisiones con roles Qt)
 ROLE_CAT = Qt.UserRole + 1
@@ -142,6 +151,11 @@ class DayEditor(QWidget):
         # Etiqueta inicial (por si hay datos previos)
         self._relabel_all()
 
+    def set_repo(self, repo: Repo) -> None:
+        """Apunta el editor al nuevo repo y refresca nombres."""
+        self.repo = repo
+        self._relabel_all()
+
     # ------ helpers de relabel ------
     def _refresh_foods_map(self) -> None:
         self._foods_by_id = {f.id: f for f in self.repo.list_foods()}
@@ -231,7 +245,8 @@ class DayEditor(QWidget):
         today_code = date.today().strftime("%Y%m%d")
         templates = Path.cwd() / "templates"
         templates.mkdir(parents=True, exist_ok=True)
-        default_path = templates / f"menu_dia_{today_code}.json"
+        profile = _profile_tag()
+        default_path = templates / f"menu_dia_{profile}_{today_code}.json"
 
         fn, _ = QFileDialog.getSaveFileName(self, "Guardar día", str(default_path), "JSON (*.json)")
         if not fn:
@@ -290,11 +305,12 @@ class DayEditor(QWidget):
         print_view.resize(1000, 600)
 
         today_code = date.today().strftime("%Y%m%d")
+        profile = _profile_tag()
         outputs = Path.cwd() / "outputs"
         outputs.mkdir(parents=True, exist_ok=True)
 
         if kind == "pdf":
-            default_path = outputs / f"menu_dia_{today_code}.pdf"
+            default_path = outputs / f"menu_dia_{profile}_{today_code}.pdf"
             fn, _ = QFileDialog.getSaveFileName(
                 self, "Exportar PDF", str(default_path), "PDF (*.pdf)"
             )
@@ -303,7 +319,7 @@ class DayEditor(QWidget):
             export_widget_to_pdf(print_view, fn)
             QMessageBox.information(self, "Exportado", f"Exportado a PDF:\n{fn}")
         else:
-            default_path = outputs / f"menu_dia_{today_code}.png"
+            default_path = outputs / f"menu_dia_{profile}_{today_code}.png"
             fn, _ = QFileDialog.getSaveFileName(
                 self,
                 "Exportar Imagen",
