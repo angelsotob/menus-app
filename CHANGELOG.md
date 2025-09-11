@@ -17,6 +17,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.4.2] - 2025-09-11
+### Added
+- Profile system with live switching (Preferences): select/create profile; data directory is profile-scoped.
+- Day/Week save & export filenames include active profile tag (`menu_dia_{profile}_{YYYYMMDD}`, `menu_semana_{profile}_{YYYYMMDD}`).
+- Default save locations: `/templates/` for JSON, `/outputs/` for PDF/PNG (auto-created).
+
+### Changed
+- DB Editor: real header sorting via `QSortFilterProxyModel`.
+- Status bar notifications after CRUD actions.
+
+### Fixed
+- Category editor now persists `categorias.json` and propagates renames to existing foods; removes orphan categories from per-meal suggestions.
+
+---
+
 ## [0.4.1] - 2025-09-10
 ### Added
 - Categories editor (global + per-meal) con persistencia en `categorias.json`.
@@ -91,7 +106,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## License
 This project is licensed under **CC BY-NC 4.0**.
 
-[Unreleased]: https://github.com/OWNER/REPO/compare/v0.4.1...HEAD
+[Unreleased]: https://github.com/owner/repo/compare/v0.4.2...HEAD
+[0.4.2]: https://github.com/owner/repo/compare/v0.4.1...v0.4.2
 [0.4.1]: https://github.com/OWNER/REPO/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/angelsotob/menus-app/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/angelsotob/menus-app/compare/v0.2.0...v0.3.0
