@@ -17,6 +17,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [5.0.0] - 2025-09-12
+### Added
+- Full translation of the application to English (UI texts, models, configuration files).
+- Consistent use of internal category keys (English) with localized display names.
+- Updated file naming conventions (`foods.json`, `categories.json`, etc.) for clarity.
+
+### Changed
+- All code, comments, and documentation migrated from Spanish to English.
+- Category handling refactored to avoid duplication between internal keys and display values.
+- Improved consistency in profile-aware menu saving/export.
+
+### Fixed
+- Resolved duplication issue where categories appeared in both Spanish and English in the food dialog.
+- Fixed atomic write function for JSON files on Unix systems.
+
+---
+
 ## [0.4.2] - 2025-09-11
 ### Added
 - Profile system with live switching (Preferences): select/create profile; data directory is profile-scoped.
@@ -106,7 +123,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## License
 This project is licensed under **CC BY-NC 4.0**.
 
-[Unreleased]: https://github.com/owner/repo/compare/v0.4.2...HEAD
+[Unreleased]: https://github.com/owner/repo/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/owner/repo/compare/v0.4.2...v0.5.0
 [0.4.2]: https://github.com/owner/repo/compare/v0.4.1...v0.4.2
 [0.4.1]: https://github.com/OWNER/REPO/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/angelsotob/menus-app/compare/v0.3.0...v0.4.0
