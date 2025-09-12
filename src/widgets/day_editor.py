@@ -26,29 +26,30 @@ from core.export_qt import export_widget_to_image, export_widget_to_pdf
 from core.models import DayMeals, DayMenu, Food
 from core.repository import Repo
 from ui import load_ui
+from widgets.food_dialog import CAT_I18N
 from widgets.print_views import DayPrintView
 
 
 def _profile_tag() -> str:
     p = get_selected_profile() or "default"
-    # filename-safe: solo alfanumérico, guion y guion bajo
+    # filename-safe: only alphanumeric, hyphen and underscore
     safe = "".join(c for c in p if c.isalnum() or c in "-_").strip()
     return safe or "default"
 
 
-# Roles de usuario para guardar datos en QListWidgetItem (evitar colisiones con roles Qt)
+# User roles to save data in QListWidgetItem (avoid collisions with Qt roles)
 ROLE_CAT = Qt.UserRole + 1
 ROLE_FID = Qt.UserRole + 2
 
 
 @dataclass
 class MealItem:
-    categoria: str
+    category: str
     food_id: str
 
     def as_label(self, foods_by_id: dict[str, Food]) -> str:
         f = foods_by_id.get(self.food_id)
-        return f.nombre if f else "(desconocido)"
+        return f.name if f else "(unknown)"
 
 
 class PickFoodDialog(QDialog):
@@ -69,8 +70,11 @@ class PickFoodDialog(QDialog):
         form = QFormLayout()
         self.cmbCat = QComboBox()
         self.cmbFood = QComboBox()
-        # Categorías sugeridas desde categorias.json
-        self.cmbCat.addItems(self.repo.default_cats_for(meal_key))
+        # Suggested categories from categories.json — show ES, keep EN as userData
+        self.cmbCat.clear()
+        for internal in self.repo.default_cats_for(meal_key):  # e.g. ["Cereals","Milk",...]
+            display = CAT_I18N.get(internal, internal)
+            self.cmbCat.addItem(display, internal)
         form.addRow(QLabel("Categoría:"), self.cmbCat)
         form.addRow(QLabel("Alimento:"), self.cmbFood)
         layout.addLayout(form)
@@ -84,10 +88,15 @@ class PickFoodDialog(QDialog):
         self._reload_foods(self.cmbCat.currentText())
 
         if current:
-            idx = self.cmbCat.findText(current.categoria)
+            # current.category is the internal value (EN)
+            idx = -1
+            for i in range(self.cmbCat.count()):
+                if self.cmbCat.itemData(i) == current.category:
+                    idx = i
+                    break
             if idx >= 0:
                 self.cmbCat.setCurrentIndex(idx)
-            foods = self._foods_for_category(current.categoria)
+            foods = self._foods_for_category(current.category)
             if foods:
                 try:
                     target = next(i for i, f in enumerate(foods) if f.id == current.food_id)
@@ -96,16 +105,17 @@ class PickFoodDialog(QDialog):
                     pass
 
     def _foods_for_category(self, cat: str) -> list[Food]:
-        return [f for f in self.repo.list_foods() if f.categoria == cat and f.activo]
+        return [f for f in self.repo.list_foods() if f.category == cat and f.active]
 
-    def _reload_foods(self, cat: str) -> None:
+    def _reload_foods(self, _unused=None) -> None:
         self.cmbFood.clear()
-        foods = self._foods_for_category(cat)
+        internal_cat = self.cmbCat.currentData() or self.cmbCat.currentText()
+        foods = self._foods_for_category(internal_cat)
         for f in foods:
-            self.cmbFood.addItem(f.nombre, f.id)
+            self.cmbFood.addItem(f.nombre if hasattr(f, "nombre") else f.name, f.id)
 
     def _accept(self) -> None:
-        cat = self.cmbCat.currentText()
+        cat = self.cmbCat.currentData() or self.cmbCat.currentText()
         food_id = self.cmbFood.currentData()
         if not food_id:
             return
@@ -122,37 +132,39 @@ class DayEditor(QWidget):
         self.repo = repo
         self._refresh_foods_map()
 
-        # Conexión de botones
-        self.ui.btnAddDes.clicked.connect(lambda: self._add_to(self.ui.lstDesayuno, "desayuno"))
-        self.ui.btnEditDes.clicked.connect(lambda: self._edit_in(self.ui.lstDesayuno, "desayuno"))
-        self.ui.btnDelDes.clicked.connect(lambda: self._del_in(self.ui.lstDesayuno))
+        # Buttons connection
+        self.ui.btnAddBre.clicked.connect(lambda: self._add_to(self.ui.lstBreakfast, "breakfast"))
+        self.ui.btnEditBre.clicked.connect(lambda: self._edit_in(self.ui.lstBreakfast, "breakfast"))
+        self.ui.btnDelBre.clicked.connect(lambda: self._del_in(self.ui.lstBreakfast))
 
-        self.ui.btnAddMed.clicked.connect(lambda: self._add_to(self.ui.lstMedia, "media_manana"))
-        self.ui.btnEditMed.clicked.connect(lambda: self._edit_in(self.ui.lstMedia, "media_manana"))
-        self.ui.btnDelMed.clicked.connect(lambda: self._del_in(self.ui.lstMedia))
+        self.ui.btnAddMid.clicked.connect(lambda: self._add_to(self.ui.lstMidmorning, "midmorning"))
+        self.ui.btnEditMid.clicked.connect(
+            lambda: self._edit_in(self.ui.lstMidmorning, "midmorning")
+        )
+        self.ui.btnDelMid.clicked.connect(lambda: self._del_in(self.ui.lstMidmorning))
 
-        self.ui.btnAddCom.clicked.connect(lambda: self._add_to(self.ui.lstComida, "comida"))
-        self.ui.btnEditCom.clicked.connect(lambda: self._edit_in(self.ui.lstComida, "comida"))
-        self.ui.btnDelCom.clicked.connect(lambda: self._del_in(self.ui.lstComida))
+        self.ui.btnAddLun.clicked.connect(lambda: self._add_to(self.ui.lstLunch, "lunch"))
+        self.ui.btnEditLun.clicked.connect(lambda: self._edit_in(self.ui.lstLunch, "lunch"))
+        self.ui.btnDelLun.clicked.connect(lambda: self._del_in(self.ui.lstLunch))
 
-        self.ui.btnAddMer.clicked.connect(lambda: self._add_to(self.ui.lstMerienda, "merienda"))
-        self.ui.btnEditMer.clicked.connect(lambda: self._edit_in(self.ui.lstMerienda, "merienda"))
-        self.ui.btnDelMer.clicked.connect(lambda: self._del_in(self.ui.lstMerienda))
+        self.ui.btnAddSna.clicked.connect(lambda: self._add_to(self.ui.lstSnack, "snack"))
+        self.ui.btnEditSna.clicked.connect(lambda: self._edit_in(self.ui.lstSnack, "snack"))
+        self.ui.btnDelSna.clicked.connect(lambda: self._del_in(self.ui.lstSnack))
 
-        self.ui.btnAddCen.clicked.connect(lambda: self._add_to(self.ui.lstCena, "cena"))
-        self.ui.btnEditCen.clicked.connect(lambda: self._edit_in(self.ui.lstCena, "cena"))
-        self.ui.btnDelCen.clicked.connect(lambda: self._del_in(self.ui.lstCena))
+        self.ui.btnAddDin.clicked.connect(lambda: self._add_to(self.ui.lstDinner, "dinner"))
+        self.ui.btnEditDin.clicked.connect(lambda: self._edit_in(self.ui.lstDinner, "dinner"))
+        self.ui.btnDelDin.clicked.connect(lambda: self._del_in(self.ui.lstDinner))
 
         self.ui.btnSave.clicked.connect(self._save_day)
         self.ui.btnLoad.clicked.connect(self._load_day)
         self.ui.btnExportPdf.clicked.connect(lambda: self._export("pdf"))
         self.ui.btnExportImg.clicked.connect(lambda: self._export("img"))
 
-        # Etiqueta inicial (por si hay datos previos)
+        # Initial label
         self._relabel_all()
 
     def set_repo(self, repo: Repo) -> None:
-        """Apunta el editor al nuevo repo y refresca nombres."""
+        """Point the editor to the new repo and refresh names."""
         self.repo = repo
         self._relabel_all()
 
@@ -169,11 +181,11 @@ class DayEditor(QWidget):
 
     def _relabel_all(self) -> None:
         self._refresh_foods_map()
-        self._relabel_list(self.ui.lstDesayuno)
-        self._relabel_list(self.ui.lstMedia)
-        self._relabel_list(self.ui.lstComida)
-        self._relabel_list(self.ui.lstMerienda)
-        self._relabel_list(self.ui.lstCena)
+        self._relabel_list(self.ui.lstBreakfast)
+        self._relabel_list(self.ui.lstMidmorning)
+        self._relabel_list(self.ui.lstLunch)
+        self._relabel_list(self.ui.lstSnack)
+        self._relabel_list(self.ui.lstDinner)
 
     # ------ Qt events ------
     def showEvent(self, e) -> None:  # type: ignore[override]
@@ -194,7 +206,7 @@ class DayEditor(QWidget):
         lst.clear()
         for it in items:
             li = QListWidgetItem(it.as_label(self._foods_by_id))
-            li.setData(ROLE_CAT, it.categoria)
+            li.setData(ROLE_CAT, it.category)
             li.setData(ROLE_FID, it.food_id)
             lst.addItem(li)
 
@@ -208,7 +220,7 @@ class DayEditor(QWidget):
         item = self._pick(meal_key)
         if item:
             it = QListWidgetItem(item.as_label(self._foods_by_id))
-            it.setData(ROLE_CAT, item.categoria)
+            it.setData(ROLE_CAT, item.category)
             it.setData(ROLE_FID, item.food_id)
             lst.addItem(it)
             self._relabel_all()
@@ -220,7 +232,7 @@ class DayEditor(QWidget):
         current = MealItem(it.data(ROLE_CAT), it.data(ROLE_FID))
         res = self._pick(meal_key, current)
         if res:
-            it.setData(ROLE_CAT, res.categoria)
+            it.setData(ROLE_CAT, res.category)
             it.setData(ROLE_FID, res.food_id)
             it.setText(res.as_label(self._foods_by_id))
             self._relabel_all()
@@ -231,14 +243,14 @@ class DayEditor(QWidget):
             lst.takeItem(lst.row(it))
             self._relabel_all()
 
-    # ----- persistencia -----
+    # ----- persistence -----
     def to_day_meals(self) -> DayMeals:
         return DayMeals(
-            desayuno=[i.food_id for i in self._items_of(self.ui.lstDesayuno)],
-            media_manana=[i.food_id for i in self._items_of(self.ui.lstMedia)],
-            comida=[i.food_id for i in self._items_of(self.ui.lstComida)],
-            merienda=[i.food_id for i in self._items_of(self.ui.lstMerienda)],
-            cena=[i.food_id for i in self._items_of(self.ui.lstCena)],
+            breakfast=[i.food_id for i in self._items_of(self.ui.lstBreakfast)],
+            midmorning=[i.food_id for i in self._items_of(self.ui.lstMidmorning)],
+            lunch=[i.food_id for i in self._items_of(self.ui.lstLunch)],
+            snack=[i.food_id for i in self._items_of(self.ui.lstSnack)],
+            dinner=[i.food_id for i in self._items_of(self.ui.lstDinner)],
         )
 
     def _save_day(self) -> None:
@@ -257,7 +269,7 @@ class DayEditor(QWidget):
             path = path.with_suffix(".json")
 
         dm = self.to_day_meals()
-        menu = DayMenu(fecha=date.today(), comidas=dm)
+        menu = DayMenu(date=date.today(), meals=dm)
 
         data = menu.model_dump(mode="json")
         text = json.dumps(data, indent=2, ensure_ascii=False)
@@ -279,22 +291,22 @@ class DayEditor(QWidget):
             return
 
         data = json.loads(Path(fn).read_text(encoding="utf-8"))
-        comidas = data.get("comidas", {})
+        meals = data.get("meals", {})
 
         def to_items(ids: Iterable[str]) -> list[MealItem]:
             return [
                 MealItem(
-                    self._foods_by_id[i].categoria if i in self._foods_by_id else "otros",
+                    self._foods_by_id[i].category if i in self._foods_by_id else "others",
                     i,
                 )
                 for i in ids
             ]
 
-        self._set_items(self.ui.lstDesayuno, to_items(comidas.get("desayuno", [])))
-        self._set_items(self.ui.lstMedia, to_items(comidas.get("media_manana", [])))
-        self._set_items(self.ui.lstComida, to_items(comidas.get("comida", [])))
-        self._set_items(self.ui.lstMerienda, to_items(comidas.get("merienda", [])))
-        self._set_items(self.ui.lstCena, to_items(comidas.get("cena", [])))
+        self._set_items(self.ui.lstBreakfast, to_items(meals.get("breakfast", [])))
+        self._set_items(self.ui.lstMidmorning, to_items(meals.get("midmorning", [])))
+        self._set_items(self.ui.lstLunch, to_items(meals.get("lunch", [])))
+        self._set_items(self.ui.lstSnack, to_items(meals.get("snack", [])))
+        self._set_items(self.ui.lstDinner, to_items(meals.get("dinner", [])))
         QMessageBox.information(self, "Cargado", f"Menú diario cargado desde:\n{fn}")
         self._relabel_all()
 

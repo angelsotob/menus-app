@@ -1,79 +1,79 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ui version="4.0">
- <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow">
-  <property name="windowTitle">
-   <string>MenusApp</string>
-  </property>
-  <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout">
-    <item>
-     <widget class="QStackedWidget" name="stack"/>
-    </item>
-   </layout>
-  </widget>
+    <ui version="4.0">
+    <class>MainWindow</class>
+    <widget class="QMainWindow" name="MainWindow">
+    <property name="windowTitle">
+    <string>MenusApp</string>
+    </property>
+    <widget class="QWidget" name="centralwidget">
+    <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+        <widget class="QStackedWidget" name="stack"/>
+        </item>
+    </layout>
+    </widget>
 
-  <!-- BARRA DE MENÚS -->
-  <widget class="QMenuBar" name="menubar">
-   <addaction name="menuArchivo"/>
-   <addaction name="menuDatos"/>
-   <addaction name="menuPreferencias"/>
-   <addaction name="menuAyuda"/>
+    <!-- MENUS TOOLBAR -->
+    <widget class="QMenuBar" name="menubar">
+    <addaction name="menuFile"/>
+    <addaction name="menuData"/>
+    <addaction name="menuPreferences"/>
+    <addaction name="menuHelp"/>
 
-   <widget class="QMenu" name="menuArchivo">
-    <property name="title"><string>&amp;Archivo</string></property>
-    <addaction name="actionExit"/>
-   </widget>
+    <widget class="QMenu" name="menuFile">
+        <property name="title"><string>&amp;Archivo</string></property>
+        <addaction name="actionExit"/>
+    </widget>
 
-   <widget class="QMenu" name="menuDatos">
-    <property name="title"><string>&amp;Datos</string></property>
-    <addaction name="actionOpenDbEditor"/>
-    <addaction name="actionAllergensEditor"/>
-    <addaction name="actionOpenDayEditor"/>
-    <addaction name="actionOpenWeekPlanner"/>
-    <addaction name="actionCategoriesEditor"/>
-   </widget>
+    <widget class="QMenu" name="menuData">
+        <property name="title"><string>&amp;Datos</string></property>
+        <addaction name="actionOpenDbEditor"/>
+        <addaction name="actionAllergensEditor"/>
+        <addaction name="actionOpenDayEditor"/>
+        <addaction name="actionOpenWeekPlanner"/>
+        <addaction name="actionCategoriesEditor"/>
+    </widget>
 
-   <widget class="QMenu" name="menuPreferencias">
-    <property name="title"><string>&amp;Preferencias</string></property>
-    <addaction name="actionPreferences"/>
-   </widget>
+    <widget class="QMenu" name="menuPreferences">
+        <property name="title"><string>&amp;Preferencias</string></property>
+        <addaction name="actionPreferences"/>
+    </widget>
 
-   <widget class="QMenu" name="menuAyuda">
-    <property name="title"><string>&amp;Ayuda</string></property>
-    <addaction name="actionAbout"/>
-   </widget>
-  </widget>
+    <widget class="QMenu" name="menuHelp">
+        <property name="title"><string>&amp;Ayuda</string></property>
+        <addaction name="actionAbout"/>
+    </widget>
+    </widget>
 
-  <!-- STATUS BAR -->
-  <widget class="QStatusBar" name="statusbar"/>
+    <!-- STATUS BAR -->
+    <widget class="QStatusBar" name="statusbar"/>
 
-  <!-- ACCIONES -->
-  <action name="actionExit">
-   <property name="text"><string>Salir</string></property>
-  </action>
-  <action name="actionOpenDbEditor">
-   <property name="text"><string>Editor de alimentos</string></property>
-  </action>
-  <action name="actionAllergensEditor">
-   <property name="text"><string>Editor de alérgenos</string></property>
-  </action>
-  <action name="actionOpenDayEditor">
-   <property name="text"><string>Planificador diario</string></property>
-  </action>
-  <action name="actionOpenWeekPlanner">
-   <property name="text"><string>Planificador semanal</string></property>
-  </action>
-  <action name="actionCategoriesEditor">
-  <property name="text"><string>Categorías</string></property>
-  </action>
-  <action name="actionPreferences">
-   <property name="text"><string>Preferencias</string></property>
-  </action>
-  <action name="actionAbout">
-   <property name="text"><string>Acerca de</string></property>
-  </action>
- </widget>
- <resources/>
- <connections/>
-</ui>
+    <!-- ACTIONS -->
+    <action name="actionExit">
+    <property name="text"><string>Salir</string></property>
+    </action>
+    <action name="actionOpenDbEditor">
+    <property name="text"><string>Editor de alimentos</string></property>
+    </action>
+    <action name="actionAllergensEditor">
+    <property name="text"><string>Editor de alérgenos</string></property>
+    </action>
+    <action name="actionOpenDayEditor">
+    <property name="text"><string>Planificador diario</string></property>
+    </action>
+    <action name="actionOpenWeekPlanner">
+    <property name="text"><string>Planificador semanal</string></property>
+    </action>
+    <action name="actionCategoriesEditor">
+    <property name="text"><string>Categorías</string></property>
+    </action>
+    <action name="actionPreferences">
+    <property name="text"><string>Preferencias</string></property>
+    </action>
+    <action name="actionAbout">
+    <property name="text"><string>Acerca de</string></property>
+    </action>
+    </widget>
+    <resources/>
+    <connections/>
+    </ui>

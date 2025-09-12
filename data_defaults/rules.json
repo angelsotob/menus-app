@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "daily": [
+    { "type": "category_count", "category": "Vegetables", "op": ">=", "quantity": 2 },
+    { "type": "forbid_allergen", "allergen": "Gluten" }
+  ],
+  "weekly": [
+    { "type": "category_count", "category": "Fish", "op": ">=", "quantity": 2 },
+    { "type": "do_not_repeat_consecutive_item", "name": "Salmón" }
+  ]
+}

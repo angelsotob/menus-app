@@ -8,7 +8,7 @@ from core.models import Food
 
 
 class FoodTableModel(QAbstractTableModel):
-    COLS = ["Nombre", "Categoría", "Alérgenos", "Etiquetas", "Activo"]
+    COLS = ["Nombre", "Categoría", "Alergenos", "Etiquetas", "Activo"]
 
     def __init__(self, rows: list[Food] | None = None) -> None:
         super().__init__()
@@ -40,15 +40,15 @@ class FoodTableModel(QAbstractTableModel):
         food = self._rows[self._filtered_idx[index.row()]]
         col = index.column()
         if col == 0:
-            return food.nombre
+            return food.name
         if col == 1:
-            return food.categoria
+            return food.category
         if col == 2:
-            return ", ".join(food.alergenos)
+            return ", ".join(food.allergens)
         if col == 3:
-            return ", ".join(food.etiquetas)
+            return ", ".join(food.labels)
         if col == 4:
-            return "Sí" if food.activo else "No"
+            return "Sí" if food.active else "No"
         return None
 
     def flags(self, index: QModelIndex) -> Qt.ItemFlags:  # type: ignore[override]
@@ -56,12 +56,10 @@ class FoodTableModel(QAbstractTableModel):
             return Qt.NoItemFlags
         return Qt.ItemIsEnabled | Qt.ItemIsSelectable
 
-    # ---- API pública ----
+    # ---- public API ----
     def set_rows(self, rows: list[Food]) -> None:
-        self.beginResetModel()
         self._rows = rows
         self._refilter()
-        self.endResetModel()
 
     def current_food(self, row: int) -> Food:
         return self._rows[self._filtered_idx[row]]
@@ -81,16 +79,16 @@ class FoodTableModel(QAbstractTableModel):
         self.beginResetModel()
         idx: list[int] = []
         for i, f in enumerate(self._rows):
-            if not self._show_inactive and not f.activo:
+            if not self._show_inactive and not f.active:
                 continue
-            if self._category and self._category != "(Todas)" and f.categoria != self._category:
+            if self._category and self._category != "(All)" and f.category != self._category:
                 continue
             if self._text:
                 parts = [
-                    f.nombre,
-                    f.categoria,
-                    " ".join(f.alergenos),
-                    " ".join(f.etiquetas),
+                    f.name,
+                    f.category,
+                    " ".join(f.allergens),
+                    " ".join(f.labels),
                 ]
                 haystack = " ".join(parts).lower()
                 if self._text not in haystack:
@@ -102,17 +100,17 @@ class FoodTableModel(QAbstractTableModel):
     @staticmethod
     def categories() -> list[str]:
         return [
-            "(Todas)",
-            "proteina",
-            "verdura",
-            "fruta",
-            "cereal_harina",
-            "legumbre",
-            "pescado",
-            "marisco",
-            "huevo",
-            "lacteo",
-            "frutos_secos",
-            "grasa",
-            "otros",
+            "(All)",
+            "Protein",
+            "Vegetables",
+            "Fruit",
+            "Cereals",
+            "Legumes",
+            "Fish",
+            "Seafood",
+            "Eggs",
+            "Milk",
+            "Nuts",
+            "Fats",
+            "Others",
         ]

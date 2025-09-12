@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "categories": [
+    "Proteina",
+    "Pescado",
+    "Marisco",
+    "Vegetales",
+    "Fruta",
+    "Legumbres",
+    "Cereales",
+    "Lácteos",
+    "Otros"
+  ],
+  "by_meal": {
+    "breakfast": ["Cereales", "Lácteos", "Fruta", "Otros"],
+    "midmorning": ["Fruta", "Proteina", "Otros"],
+    "lunch": ["Proteina", "Vegetales", "Cereales", "Legumbres", "Otros"],
+    "snack": ["Fruta", "Lácteos", "Otros"],
+    "dinner": ["Pescado", "Proteina", "Vegetales", "Otros"]
+  }
+}

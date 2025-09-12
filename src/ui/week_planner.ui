@@ -11,47 +11,47 @@
      <property name="tabPosition">
       <enum>QTabWidget::North</enum>
      </property>
-     <widget class="QWidget" name="tabLunes">
+     <widget class="QWidget" name="tabMonday">
       <attribute name="title">
        <string>Lunes</string>
       </attribute>
-      <layout class="QVBoxLayout" name="layoutLunes"/>
+      <layout class="QVBoxLayout" name="layoutMonday"/>
      </widget>
-     <widget class="QWidget" name="tabMartes">
+     <widget class="QWidget" name="tabTuesday">
       <attribute name="title">
        <string>Martes</string>
       </attribute>
-      <layout class="QVBoxLayout" name="layoutMartes"/>
+      <layout class="QVBoxLayout" name="layoutTuesday"/>
      </widget>
-     <widget class="QWidget" name="tabMiercoles">
+     <widget class="QWidget" name="tabWednesday">
       <attribute name="title">
        <string>Miércoles</string>
       </attribute>
-      <layout class="QVBoxLayout" name="layoutMiercoles"/>
+      <layout class="QVBoxLayout" name="layoutWednesday"/>
      </widget>
-     <widget class="QWidget" name="tabJueves">
+     <widget class="QWidget" name="tabThursday">
       <attribute name="title">
        <string>Jueves</string>
       </attribute>
-      <layout class="QVBoxLayout" name="layoutJueves"/>
+      <layout class="QVBoxLayout" name="layoutThursday"/>
      </widget>
-     <widget class="QWidget" name="tabViernes">
+     <widget class="QWidget" name="tabFriday">
       <attribute name="title">
        <string>Viernes</string>
       </attribute>
-      <layout class="QVBoxLayout" name="layoutViernes"/>
+      <layout class="QVBoxLayout" name="layoutFriday"/>
      </widget>
-     <widget class="QWidget" name="tabSabado">
+     <widget class="QWidget" name="tabSaturday">
       <attribute name="title">
        <string>Sábado</string>
       </attribute>
-      <layout class="QVBoxLayout" name="layoutSabado"/>
+      <layout class="QVBoxLayout" name="layoutSaturday"/>
      </widget>
-     <widget class="QWidget" name="tabDomingo">
+     <widget class="QWidget" name="tabSunday">
       <attribute name="title">
        <string>Domingo</string>
       </attribute>
-      <layout class="QVBoxLayout" name="layoutDomingo"/>
+      <layout class="QVBoxLayout" name="layoutSunday"/>
      </widget>
     </widget>
    </item>

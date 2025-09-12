@@ -14,20 +14,20 @@ from ui import load_ui
 from widgets.day_editor import DayEditor, MealItem
 from widgets.print_views import WeekPrintView
 
-DAY_KEYS = ["lunes", "martes", "miercoles", "jueves", "viernes", "sabado", "domingo"]
+DAY_KEYS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
 TAB_LAYOUT_NAMES = [
-    "layoutLunes",
-    "layoutMartes",
-    "layoutMiercoles",
-    "layoutJueves",
-    "layoutViernes",
-    "layoutSabado",
-    "layoutDomingo",
+    "layoutMonday",
+    "layoutTuesday",
+    "layoutWednesday",
+    "layoutThursday",
+    "layoutFriday",
+    "layoutSaturday",
+    "layoutSunday",
 ]
 
 
 def monday_of(d: date) -> date:
-    """Devuelve el lunes de la semana de d."""
+    """Return the Monday of d's week."""
     return d - timedelta(days=d.weekday())
 
 
@@ -41,10 +41,10 @@ class WeekPlanner(QWidget):
     def __init__(self, repo: Repo, parent=None) -> None:
         super().__init__(parent)
         self.ui = load_ui("week_planner.ui")
-        self.setLayout(self.ui.layout())  # adopta el layout del .ui
+        self.setLayout(self.ui.layout())  # Inherit the .ui layout
         self.repo = repo
 
-        # Un DayEditor por pestaña
+        # One DayEditor per tab
         self._editors: dict[str, DayEditor] = {}
         for key, layout_name in zip(DAY_KEYS, TAB_LAYOUT_NAMES):
             lay: QVBoxLayout = getattr(self.ui, layout_name)
@@ -52,27 +52,27 @@ class WeekPlanner(QWidget):
             lay.addWidget(ed)
             self._editors[key] = ed
 
-        # Botones
+        # Buttons
         self.ui.btnSave.clicked.connect(self._save_week)
         self.ui.btnLoad.clicked.connect(self._load_week)
         self.ui.btnExportPdf.clicked.connect(lambda: self._export("pdf"))
         self.ui.btnExportImg.clicked.connect(lambda: self._export("img"))
 
-        # foods map para export
+        # foods map to export
         self._foods_by_id = {f.id: f for f in self.repo.list_foods()}
 
     # ---------- helpers ----------
     def to_week_menu(self) -> WeekMenu:
-        """Convierte los 7 DayEditor a un WeekMenu."""
-        dias = {}
+        """Convert the 7 DayEditors into a WeekMenu."""
+        days = {}
         for key in DAY_KEYS:
             ed = self._editors[key]
-            dias[key] = ed.to_day_meals()
+            days[key] = ed.to_day_meals()
         start = monday_of(date.today())
-        return WeekMenu(semana_inicio=start, dias=dias)
+        return WeekMenu(week_start=start, days=days)
 
     def _set_day_from_ids(self, key: str, ids_by_meal: dict[str, list[str]]) -> None:
-        """Setea un día concreto en su DayEditor a partir de ids por comida."""
+        """Set a specific day in its DayEditor from meal IDs."""
         ed = self._editors[key]
 
         def to_items(ids: list[str]) -> list[MealItem]:
@@ -80,19 +80,19 @@ class WeekPlanner(QWidget):
             foods_by_id = self._foods_by_id
             for fid in ids:
                 if fid in foods_by_id:
-                    items.append(MealItem(foods_by_id[fid].categoria, fid))
+                    items.append(MealItem(foods_by_id[fid].category, fid))
                 else:
                     items.append(MealItem("otros", fid))
             return items
 
-        ed._set_items(ed.ui.lstDesayuno, to_items(ids_by_meal.get("desayuno", [])))
-        ed._set_items(ed.ui.lstMedia, to_items(ids_by_meal.get("media_manana", [])))
-        ed._set_items(ed.ui.lstComida, to_items(ids_by_meal.get("comida", [])))
-        ed._set_items(ed.ui.lstMerienda, to_items(ids_by_meal.get("merienda", [])))
-        ed._set_items(ed.ui.lstCena, to_items(ids_by_meal.get("cena", [])))
+        ed._set_items(ed.ui.lstBreakfast, to_items(ids_by_meal.get("breakfast", [])))
+        ed._set_items(ed.ui.lstMidmorning, to_items(ids_by_meal.get("midmorning", [])))
+        ed._set_items(ed.ui.lstLunch, to_items(ids_by_meal.get("lunch", [])))
+        ed._set_items(ed.ui.lstSnack, to_items(ids_by_meal.get("snack", [])))
+        ed._set_items(ed.ui.lstDinner, to_items(ids_by_meal.get("dinner", [])))
         ed._relabel_all()
 
-    # ---------- persistencia ----------
+    # ---------- persistence ----------
     def _save_week(self) -> None:
         start = monday_of(date.today())
         code = start.strftime("%Y%m%d")
@@ -117,7 +117,7 @@ class WeekPlanner(QWidget):
         text = json.dumps(data, indent=2, ensure_ascii=False)
         path.write_text(text, encoding="utf-8")
 
-        # Opcional: persistir también alguna referencia interna
+        # Optional: also persist some internal reference.
         try:
             self.repo.save_rules({"last_saved_week": str(path)})
         except Exception:
@@ -134,18 +134,18 @@ class WeekPlanner(QWidget):
             return
 
         data = json.loads(Path(fn).read_text(encoding="utf-8"))
-        dias = data.get("dias", {})
+        days = data.get("days", {})
 
         for key in DAY_KEYS:
             ids_by_meal = {}
-            d = dias.get(key, {})
+            d = days.get(key, {})
             if isinstance(d, dict):
                 ids_by_meal = {
-                    "desayuno": d.get("desayuno", []),
-                    "media_manana": d.get("media_manana", []),
-                    "comida": d.get("comida", []),
-                    "merienda": d.get("merienda", []),
-                    "cena": d.get("cena", []),
+                    "breakfast": d.get("breakfast", []),
+                    "midmorning": d.get("midmorning", []),
+                    "lunch": d.get("lunch", []),
+                    "snack": d.get("snack", []),
+                    "dinner": d.get("dinner", []),
                 }
             self._set_day_from_ids(key, ids_by_meal)
 
@@ -157,7 +157,7 @@ class WeekPlanner(QWidget):
         print_view = WeekPrintView(self._foods_by_id, wm, parent=None)
         print_view.resize(1400, 900)
 
-        start = wm.semana_inicio
+        start = wm.week_start
         code = start.strftime("%Y%m%d")
         profile = _profile_tag()
 

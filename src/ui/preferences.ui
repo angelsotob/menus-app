@@ -8,7 +8,7 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <layout class="QFormLayout" name="formLayout">
-     <!-- Row 0: Carpeta de datos -->
+     <!-- Row 0: Data directory -->
      <item row="0" column="0">
       <widget class="QLabel" name="lblDataDir">
        <property name="text">
@@ -58,7 +58,7 @@
       </layout>
      </item>
 
-     <!-- Row 2: Tema -->
+     <!-- Row 2: Theme -->
      <item row="2" column="0">
       <widget class="QLabel" name="lblTheme">
        <property name="text">

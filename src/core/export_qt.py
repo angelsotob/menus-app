@@ -9,13 +9,13 @@ from PySide6.QtWidgets import QWidget
 
 
 def export_widget_to_pdf(widget: QWidget, path: str | Path) -> None:
-    """Renderiza el widget a PDF, ajustando y centrando el contenido a A4 con márgenes."""
+    """Renders the widget to PDF, adjusting and centering the content to A4 with margins.."""
     path = str(path)
     printer = QPrinter(QPrinter.HighResolution)
     printer.setOutputFormat(QPrinter.PdfFormat)
     printer.setOutputFileName(path)
 
-    # A4 vertical + márgenes en milímetros
+    # A4 vertical + margins in millimeters
     printer.setPageSize(QPageSize(QPageSize.A4))
     printer.setPageOrientation(QPageLayout.Portrait)
     printer.setPageMargins(QMarginsF(12, 12, 12, 12), QPageLayout.Unit.Millimeter)
@@ -25,7 +25,7 @@ def export_widget_to_pdf(widget: QWidget, path: str | Path) -> None:
         if not painter.begin(printer):
             return
 
-        # Área imprimible en píxeles del dispositivo
+        # Printable area in pixels of the device
         layout = printer.pageLayout()
         page_rect = layout.paintRectPixels(printer.resolution())
         pw, ph = float(page_rect.width()), float(page_rect.height())
@@ -35,12 +35,12 @@ def export_widget_to_pdf(widget: QWidget, path: str | Path) -> None:
             widget.render(painter, QPoint(0, 0))
             return
 
-        # Escalado uniforme para encajar en el área de impresión
+        # Uniform scaling to fit the print area
         sx = pw / ww
         sy = ph / wh
         scale = min(sx, sy)
 
-        # Centrado
+        # Centered
         tx = (pw - ww * scale) / 2.0
         ty = (ph - wh * scale) / 2.0
 
@@ -57,7 +57,7 @@ def export_widget_to_image(
     fmt: str = "PNG",
     scale: float = 2.0,
 ) -> None:
-    """Renderiza el widget a imagen (PNG/JPEG) con factor de escala."""
+    """Render widget to image (PNG/JPEG) with scale factor."""
     w = max(1, int(widget.width() * scale))
     h = max(1, int(widget.height() * scale))
     image = QImage(w, h, QImage.Format_ARGB32)

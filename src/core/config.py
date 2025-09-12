@@ -4,13 +4,13 @@ import os
 from pathlib import Path
 
 APP_NAME = "MenusApp"
-ACTIVE_FILE = "active.txt"  # guarda el nombre del perfil activo
+ACTIVE_FILE = "active.txt"  # Saves active profile name
 
 
 def get_data_dir() -> Path:
-    """Orden de resolución:
+    """Resolution order:
     1) MENUSAPP_DATA_DIR (env)
-    2) ./MenusApp (si existe en el cwd)
+    2) ./MenusApp (if exists in cwd)
     3) ~/MenusApp
     """
     env = os.getenv("MENUSAPP_DATA_DIR")
@@ -29,14 +29,14 @@ def ensure_data_dir() -> Path:
     return root
 
 
-# ----------------- Perfiles -----------------
+# ----------------- Profiles -----------------
 def profiles_root() -> Path:
-    """Carpeta que contiene todos los perfiles."""
+    """Directory that includes all profiles."""
     return ensure_data_dir() / "profiles"
 
 
 def list_profiles() -> list[str]:
-    """Lista nombres de perfiles (carpetas inmediatas en profiles/)."""
+    """List profiles names (immediate folders in profiles/)."""
     p = profiles_root()
     if not p.exists():
         return []
@@ -44,14 +44,14 @@ def list_profiles() -> list[str]:
 
 
 def set_selected_profile(name: str) -> None:
-    """Guarda el perfil activo en profiles/active.txt."""
+    """Saves active profile in profiles/active.txt."""
     r = profiles_root()
     r.mkdir(parents=True, exist_ok=True)
     (r / ACTIVE_FILE).write_text(name, encoding="utf-8")
 
 
 def get_selected_profile() -> str | None:
-    """Lee el perfil activo desde profiles/active.txt (si existe)."""
+    """Reads active profile from profiles/active.txt (if exists)."""
     f = profiles_root() / ACTIVE_FILE
     if not f.exists():
         return None
@@ -60,13 +60,13 @@ def get_selected_profile() -> str | None:
 
 
 def profile_root(name: str) -> Path:
-    """Carpeta raíz para un perfil concreto."""
+    """Root directory of specific profile."""
     return profiles_root() / name
 
 
 def ensure_profile_root() -> Path:
-    """Asegura que la carpeta del perfil activo existe. Si no hay perfil,
-    crea uno por defecto 'default' y lo selecciona."""
+    """Ensures that the folder of the active profile exists. If there is no profile,
+    creates a default 'default' and selects it."""
     r = profiles_root()
     r.mkdir(parents=True, exist_ok=True)
 
@@ -81,7 +81,7 @@ def ensure_profile_root() -> Path:
     return root
 
 
-# --- Aliases retrocompatibilidad (si había código viejo) ---
+# --- Aliases backward compatibility (if there was old code) ---
 def get_active_profile() -> str | None:
-    """Alias retrocompatible de get_selected_profile()."""
+    """Aliases backward compatibility de get_selected_profile()."""
     return get_selected_profile()

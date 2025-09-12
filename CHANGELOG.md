@@ -20,7 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.4.2] - 2025-09-11
 ### Added
 - Profile system with live switching (Preferences): select/create profile; data directory is profile-scoped.
-- Day/Week save & export filenames include active profile tag (`menu_dia_{profile}_{YYYYMMDD}`, `menu_semana_{profile}_{YYYYMMDD}`).
+- Day/Week save & export filenames include active profile tag (`menu_day_{profile}_{YYYYMMDD}`, `menu_week_{profile}_{YYYYMMDD}`).
 - Default save locations: `/templates/` for JSON, `/outputs/` for PDF/PNG (auto-created).
 
 ### Changed
@@ -28,78 +28,78 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Status bar notifications after CRUD actions.
 
 ### Fixed
-- Category editor now persists `categorias.json` and propagates renames to existing foods; removes orphan categories from per-meal suggestions.
+- Category editor now persists `categories.json` and propagates renames to existing foods; removes orphan categories from per-meal suggestions.
 
 ---
 
 ## [0.4.1] - 2025-09-10
 ### Added
-- Categories editor (global + per-meal) con persistencia en `categorias.json`.
-- Integración con FoodDialog/DbEditor y planners (Day/Week) leyendo mapeos desde repo.
+- Categories editor (global + per-meal) with persistence in `categories.json`.
+- Integration with FoodDialog/DbEditor and planners (Day/Week) reading mappings from repo.
 
 ### Changed
-- Remapeo automático de alimentos al renombrar/borrar categorías.
-- Export routes por defecto a `/outputs/` y plantillas a `/templates/`.
+- Automatic remapping of foods when renaming/deleting categories.
+- Default export routes to `/outputs/` and templates to `/templates/`.
 
 ### Fixed
-- Ordenación real en la tabla (proxy model).
+- Real sorting in the table (proxy model).
 
 ---
 
 ## [0.4.0] - 2025-09-09
 ### Added
-- **Week planner (Planificador semanal)**:
-  - Pestañas L–D con un `DayEditor` por día.
-  - Guardar/Cargar semana en **`/templates/`** como JSON (`menu_semana_YYYYMMDD.json`, usando el lunes como referencia).
-  - Exportar **PDF/Imagen** a **`/outputs/`** (`menu_semana_YYYYMMDD.*`).
-  - Vista de impresión semanal con **ancho de columna fijo** y **word-wrap**.
-- Silenciados avisos de Designer en `week_planner.ui` usando `QTabWidget::North` y `Qt::Horizontal`.
+- **Week planner**:
+  - Tabs M–S with one `DayEditor` per day.
+  - Save/Load week in **`/templates/`** as JSON (`menu_week_YYYYMMDD.json`, using Monday as reference).
+  - Export **PDF/Image** to **`/outputs/`** (`menu_week_YYYYMMDD.*`).
+  - Weekly print view with **fixed column width** and **word-wrap**.
+- Designer warnings silenced in `week_planner.ui` using `QTabWidget::North` and `Qt::Horizontal`.
 
 ### Changed
-- Export diario y semanal: nombres por defecto con **fecha** (`YYYYMMDD`).
+- Daily and weekly export: default filenames with **date** (`YYYYMMDD`).
 
 ### Fixed
-- Asegurar creación de carpetas por defecto (`/templates/`, `/outputs/`) si no existen.
+- Ensure creation of default folders (`/templates/`, `/outputs/`) if they don’t exist.
 
 ---
 
 ## [0.3.0] - 2025-09-08
 ### Added
-- **Day planner (Planificador diario)**:
-  - 5 comidas: Desayuno, Media mañana, Comida, Merienda y Cena.
-  - Selección de alimentos por **categorías sugeridas**.
-  - Guardar/Cargar día en JSON (inicialmente en ruta elegida).
-  - Exportar día a **PDF/Imagen**.
-  - Vista de impresión diaria con **ancho fijo** de columna y **word-wrap**.
-- Nombres por defecto con fecha (`menu_dia_YYYYMMDD.*`).
+- **Day planner**:
+  - 5 meals: Breakfast, Midmorning, Lunch, Snack, and Dinner.
+  - Food selection by **suggested categories**.
+  - Save/Load day in JSON (initially in chosen path).
+  - Export day to **PDF/Image**.
+  - Daily print view with **fixed column width** and **word-wrap**.
+- Default filenames with date (`menu_day_YYYYMMDD.*`).
 
 ### Fixed
-- Etiquetado correcto de items (mostrar **nombre** y no el **ID**).
-- Serialización JSON compatible (fechas → ISO).
+- Correct item labeling (show **name** instead of **ID**).
+- JSON serialization compatible (dates → ISO).
 
 ---
 
 ## [0.2.0] - 2025-09-06
 ### Added
-- **Editor de Base de Datos** (GUI):
-  - Tabla con filtros (texto, categoría, mostrar inactivos), ordenación y menú contextual.
-  - Altas/ediciones/bajas, activar/desactivar (soft delete).
-  - Editor de **alérgenos** (lista editable).
-  - Diálogo de **preferencias** (tema, carpeta datos — básico).
-- Temas: **oscuro por defecto**, opción de claro.
+- **Database Editor** (GUI):
+  - Table with filters (text, category, show inactive), sorting, and context menu.
+  - Create/Edit/Delete, activate/deactivate (soft delete).
+  - **Allergens editor** (editable list).
+  - **Preferences dialog** (theme, data folder — basic).
+- Themes: **dark by default**, optional light theme.
 
 ### Changed
-- Estructura de UI con `QUiLoader` y carga dinámica desde `/src/ui`.
+- UI structure with `QUiLoader` and dynamic loading from `/src/ui`.
 
 ---
 
 ## [0.1.0] - 2025-09-05
 ### Added
-- **Fase 0 (bootstrap)**:
-  - Modelos base (`Food`, `DayMeals`, `DayMenu`, `WeekMenu`).
-  - Repositorio JSON (`Repo`) con lectura/escritura atómica.
-  - Semillas por defecto (`alimentos.json`, `alergenos.json`, `reglas.json`).
-  - Script de arranque y verificación inicial.
+- **Phase 0 (bootstrap)**:
+  - Base models (`Food`, `DayMeals`, `DayMenu`, `WeekMenu`).
+  - JSON repository (`Repo`) with atomic read/write.
+  - Default seeds (`foods.json`, `allergens.json`, `rules.json`).
+  - Startup and initial verification script.
 
 ---
 
