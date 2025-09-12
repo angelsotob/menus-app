@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "foods": [
+    {
+      "id": "food_0001",
+      "name": "Salmón",
+      "category": "Fish",
+      "allergens": ["Fish"],
+      "labels": ["omega3", "rápido"],
+      "notes": "Plancha o al horno",
+      "active": true
+    },
+    {
+      "id": "food_0002",
+      "name": "Brécol",
+      "category": "Vegetables",
+      "allergens": [],
+      "labels": ["fibra"],
+      "notes": null,
+      "active": true
+    }
+  ]
+}

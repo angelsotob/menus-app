@@ -27,7 +27,7 @@ class AllergensEditor(QDialog):
             self.ui.lstAllergens.addItem(a)
 
     def on_add(self) -> None:
-        text, ok = QInputDialog.getText(self, "Nuevo alérgeno", "Nombre:")
+        text, ok = QInputDialog.getText(self, "New allergen", "Name:")
         if ok and text.strip():
             self.ui.lstAllergens.addItem(text.strip())
 
@@ -35,7 +35,7 @@ class AllergensEditor(QDialog):
         cur = self.ui.lstAllergens.currentItem()
         if not cur:
             return
-        text, ok = QInputDialog.getText(self, "Renombrar", "Nuevo nombre:", text=cur.text())
+        text, ok = QInputDialog.getText(self, "Rename", "New name:", text=cur.text())
         if ok and text.strip():
             cur.setText(text.strip())
 

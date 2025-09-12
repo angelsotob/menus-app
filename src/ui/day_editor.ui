@@ -6,85 +6,85 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <layout class="QGridLayout" name="gridMeals">
-     <!-- Desayuno -->
+     <!-- Breakfast -->
      <item row="0" column="0">
-      <widget class="QGroupBox" name="grpDesayuno">
+      <widget class="QGroupBox" name="grpBreakfast">
        <property name="title"><string>Desayuno</string></property>
        <layout class="QVBoxLayout">
-        <item><widget class="QListWidget" name="lstDesayuno"/></item>
+        <item><widget class="QListWidget" name="lstBreakfast"/></item>
         <item>
          <layout class="QHBoxLayout">
-          <item><widget class="QPushButton" name="btnAddDes"><property name="text"><string>Añadir</string></property></widget></item>
-          <item><widget class="QPushButton" name="btnEditDes"><property name="text"><string>Editar</string></property></widget></item>
-          <item><widget class="QPushButton" name="btnDelDes"><property name="text"><string>Eliminar</string></property></widget></item>
+          <item><widget class="QPushButton" name="btnAddBre"><property name="text"><string>Añadir</string></property></widget></item>
+          <item><widget class="QPushButton" name="btnEditBre"><property name="text"><string>Editar</string></property></widget></item>
+          <item><widget class="QPushButton" name="btnDelBre"><property name="text"><string>Eliminar</string></property></widget></item>
          </layout>
         </item>
        </layout>
       </widget>
      </item>
 
-     <!-- Media mañana -->
+     <!-- MidMorning -->
      <item row="0" column="1">
-      <widget class="QGroupBox" name="grpMedia">
+      <widget class="QGroupBox" name="grpMidmorning">
        <property name="title"><string>Media mañana</string></property>
        <layout class="QVBoxLayout">
-        <item><widget class="QListWidget" name="lstMedia"/></item>
+        <item><widget class="QListWidget" name="lstMidmorning"/></item>
         <item>
          <layout class="QHBoxLayout">
-          <item><widget class="QPushButton" name="btnAddMed"><property name="text"><string>Añadir</string></property></widget></item>
-          <item><widget class="QPushButton" name="btnEditMed"><property name="text"><string>Editar</string></property></widget></item>
-          <item><widget class="QPushButton" name="btnDelMed"><property name="text"><string>Eliminar</string></property></widget></item>
+          <item><widget class="QPushButton" name="btnAddMid"><property name="text"><string>Añadir</string></property></widget></item>
+          <item><widget class="QPushButton" name="btnEditMid"><property name="text"><string>Editar</string></property></widget></item>
+          <item><widget class="QPushButton" name="btnDelMid"><property name="text"><string>Eliminar</string></property></widget></item>
          </layout>
         </item>
        </layout>
       </widget>
      </item>
 
-     <!-- Comida -->
+     <!-- Lunch -->
      <item row="1" column="0">
-      <widget class="QGroupBox" name="grpComida">
+      <widget class="QGroupBox" name="grpLunch">
        <property name="title"><string>Comida</string></property>
        <layout class="QVBoxLayout">
-        <item><widget class="QListWidget" name="lstComida"/></item>
+        <item><widget class="QListWidget" name="lstLunch"/></item>
         <item>
          <layout class="QHBoxLayout">
-          <item><widget class="QPushButton" name="btnAddCom"><property name="text"><string>Añadir</string></property></widget></item>
-          <item><widget class="QPushButton" name="btnEditCom"><property name="text"><string>Editar</string></property></widget></item>
-          <item><widget class="QPushButton" name="btnDelCom"><property name="text"><string>Eliminar</string></property></widget></item>
+          <item><widget class="QPushButton" name="btnAddLun"><property name="text"><string>Añadir</string></property></widget></item>
+          <item><widget class="QPushButton" name="btnEditLun"><property name="text"><string>Editar</string></property></widget></item>
+          <item><widget class="QPushButton" name="btnDelLun"><property name="text"><string>Eliminar</string></property></widget></item>
          </layout>
         </item>
        </layout>
       </widget>
      </item>
 
-     <!-- Merienda -->
+     <!-- Snack -->
      <item row="1" column="1">
-      <widget class="QGroupBox" name="grpMerienda">
+      <widget class="QGroupBox" name="grpSnack">
        <property name="title"><string>Merienda</string></property>
        <layout class="QVBoxLayout">
-        <item><widget class="QListWidget" name="lstMerienda"/></item>
+        <item><widget class="QListWidget" name="lstSnack"/></item>
         <item>
          <layout class="QHBoxLayout">
-          <item><widget class="QPushButton" name="btnAddMer"><property name="text"><string>Añadir</string></property></widget></item>
-          <item><widget class="QPushButton" name="btnEditMer"><property name="text"><string>Editar</string></property></widget></item>
-          <item><widget class="QPushButton" name="btnDelMer"><property name="text"><string>Eliminar</string></property></widget></item>
+          <item><widget class="QPushButton" name="btnAddSna"><property name="text"><string>Añadir</string></property></widget></item>
+          <item><widget class="QPushButton" name="btnEditSna"><property name="text"><string>Editar</string></property></widget></item>
+          <item><widget class="QPushButton" name="btnDelSna"><property name="text"><string>Eliminar</string></property></widget></item>
          </layout>
         </item>
        </layout>
       </widget>
      </item>
 
-     <!-- Cena -->
+     <!-- Dinner -->
      <item row="2" column="0" colspan="2">
-      <widget class="QGroupBox" name="grpCena">
+      <widget class="QGroupBox" name="grpDinner">
        <property name="title"><string>Cena</string></property>
        <layout class="QVBoxLayout">
-        <item><widget class="QListWidget" name="lstCena"/></item>
+        <item><widget class="QListWidget" name="lstDinner"/></item>
         <item>
          <layout class="QHBoxLayout">
-          <item><widget class="QPushButton" name="btnAddCen"><property name="text"><string>Añadir</string></property></widget></item>
-          <item><widget class="QPushButton" name="btnEditCen"><property name="text"><string>Editar</string></property></widget></item>
-          <item><widget class="QPushButton" name="btnDelCen"><property name="text"><string>Eliminar</string></property></widget></item>
+          <item><widget class="QPushButton" name="btnAddDin"><property name="text"><string>Añadir</string></property></widget></item>
+          <item><widget class="QPushButton" name="btnEditDin"><property name="text"><string>Editar</string></property></widget></item>
+          <item><widget class="QPushButton" name="btnDelDin"><property name="text"><string>Eliminar</string></property></widget></item>
          </layout>
         </item>
        </layout>
@@ -93,7 +93,7 @@
     </layout>
    </item>
 
-   <!-- Acciones generales -->
+   <!-- General actions -->
    <item>
     <layout class="QHBoxLayout">
      <item><spacer><property name="orientation"><enum>Qt::Horizontal</enum></property></spacer></item>

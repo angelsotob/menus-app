@@ -8,7 +8,7 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <layout class="QHBoxLayout" name="mainRow">
-     <!-- Columna izquierda: categorías globales -->
+     <!-- Left column: global categories -->
      <item>
       <layout class="QVBoxLayout" name="leftCol">
        <item><widget class="QLabel" name="lblGlobal"><property name="text"><string>Categorías globales</string></property></widget></item>
@@ -28,7 +28,7 @@
       </layout>
      </item>
 
-     <!-- Separador -->
+     <!-- Separator -->
      <item>
       <widget class="QFrame" name="sep">
        <property name="frameShape"><enum>QFrame::VLine</enum></property>
@@ -36,7 +36,7 @@
       </widget>
      </item>
 
-     <!-- Columna derecha: mapeo por comida -->
+     <!-- Right column: mapping by meal -->
      <item>
       <layout class="QVBoxLayout" name="rightCol">
        <item><widget class="QLabel" name="lblMeal"><property name="text"><string>Sugerencias por comida</string></property></widget></item>

@@ -31,7 +31,7 @@ class DbEditor(QWidget):
         self.repo = repo
         self.notify = notify or (lambda _m, _ms: None)
 
-        # modelo + proxy
+        # model + proxy
         self.model = FoodTableModel(self.repo.list_foods())
         self.proxy = QSortFilterProxyModel(self)
         self.proxy.setSourceModel(self.model)
@@ -52,28 +52,44 @@ class DbEditor(QWidget):
         self.ui.tblFoods.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.ui.tblFoods.resizeColumnsToContents()
 
-        # filtros
-        self.ui.cmbCategory.addItems(FoodTableModel.categories())
+        # filters
+        for disp, val in [
+            ("(Todas)", "(All)"),
+            ("Proteína", "Protein"),
+            ("Verduras", "Vegetables"),
+            ("Fruta", "Fruit"),
+            ("Cereales", "Cereals"),
+            ("Legumbres", "Legumes"),
+            ("Pescado", "Fish"),
+            ("Marisco", "Seafood"),
+            ("Huevos", "Eggs"),
+            ("Lácteos", "Milk"),
+            ("Frutos secos", "Nuts"),
+            ("Grasas", "Fats"),
+            ("Otros", "Others"),
+        ]:
+            self.ui.cmbCategory.addItem(disp, val)
+
         self.ui.txtSearch.textChanged.connect(self._apply_filters)
         self.ui.cmbCategory.currentTextChanged.connect(self._apply_filters)
         self.ui.chkShowInactive.stateChanged.connect(self._apply_filters)
 
-        # botones
+        # buttons
         self.ui.btnAdd.clicked.connect(self.on_add)
         self.ui.btnEdit.clicked.connect(self.on_edit)
         self.ui.btnToggleActive.clicked.connect(self.on_toggle_active)
         self.ui.btnDelete.clicked.connect(self.on_delete)
 
-        # menú contextual
+        # context menu
         self.ui.tblFoods.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.tblFoods.customContextMenuRequested.connect(self._open_context_menu)
 
-        # atajos
+        # shortcuts
         self._install_shortcuts()
 
         self._apply_filters()
 
-    # ---- API de refresco para cambios de perfil ----
+    # ---- Refresh API for profile changes ----
     def refresh_from_repo(self, repo: Repo | None = None, keep_selection: bool = False) -> None:
         if repo is not None:
             self.repo = repo
@@ -88,7 +104,7 @@ class DbEditor(QWidget):
         self._apply_filters()
 
         if prev_id:
-            # intentar re-seleccionar por id
+            # try to re-select by id
             for r, f in enumerate(self.model._rows):
                 if f.id == prev_id:
                     src_idx = self.model.index(r, 0)
@@ -97,7 +113,7 @@ class DbEditor(QWidget):
                         self.ui.tblFoods.selectRow(proxy_idx.row())
                     break
 
-    # ---- atajos, menú contextual, acciones ----
+    # ---- shortcuts, context menu, actions ----
     def _install_shortcuts(self) -> None:
         act_new = QAction(self)
         act_new.setShortcut(QKeySequence("Ctrl+N"))
@@ -126,7 +142,7 @@ class DbEditor(QWidget):
         current = self.model.current_food(row)
         menu = QMenu(self)
         act_edit = menu.addAction("Editar")
-        act_toggle = menu.addAction("Activar" if not current.activo else "Desactivar")
+        act_toggle = menu.addAction("Activar" if not current.active else "Desactivar")
         act_delete = menu.addAction("Borrar")
         action = menu.exec(self.ui.tblFoods.viewport().mapToGlobal(pos))
         if action is None:
@@ -175,14 +191,14 @@ class DbEditor(QWidget):
         answer = QMessageBox.question(
             self,
             "Confirmar",
-            f"¿Quieres {'activar' if not current.activo else 'desactivar'} '{current.nombre}'?",
+            f"¿Quieres {'activar' if not current.active else 'desactivar'} '{current.name}'?",
         )
         if answer != QMessageBox.Yes:
             return
         foods = self.repo.list_foods()
         for i, f in enumerate(foods):
             if f.id == current.id:
-                foods[i].activo = not f.activo
+                foods[i].active = not f.active
                 break
         self.repo.save_foods(foods)
         self.model.set_rows(foods)
@@ -195,7 +211,7 @@ class DbEditor(QWidget):
             return
         current = self.model.current_food(row)
         answer = QMessageBox.question(
-            self, "Confirmar", f"¿Borrar definitivamente '{current.nombre}'?"
+            self, "Confirmar", f"¿Borrar definitivamente '{current.name}'?"
         )
         if answer != QMessageBox.Yes:
             return
@@ -207,7 +223,7 @@ class DbEditor(QWidget):
 
     def _apply_filters(self) -> None:
         text = self.ui.txtSearch.text()
-        cat = self.ui.cmbCategory.currentText()
+        cat = self.ui.cmbCategory.currentData()
         show_inactive = self.ui.chkShowInactive.isChecked()
         self.model.apply_filters(text, cat, show_inactive)
         self.ui.tblFoods.sortByColumn(

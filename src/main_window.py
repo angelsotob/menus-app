@@ -9,18 +9,18 @@ from ui import load_ui
 
 
 class MainWindow:
-    """Wrapper sobre el QMainWindow cargado desde .ui."""
+    """Wrapper over the QMainWindow loaded from .ui."""
 
     def __init__(self) -> None:
-        self.ui: QMainWindow = load_ui("main_window.ui")  # es un QMainWindow
+        self.ui: QMainWindow = load_ui("main_window.ui")  # is a QMainWindow
         self.repo = Repo(ensure_profile_root())
         self.ui.setWindowTitle(self._title_with_profile())
 
-        # Asegura status bar
+        # Ensures status bar
         if self.ui.statusBar() is None:
             self.ui.setStatusBar(QStatusBar(self.ui))
 
-        # Acciones de menú
+        # Menu actions
         act_exit = self.ui.findChild(QAction, "actionExit")
         act_db = self.ui.findChild(QAction, "actionOpenDbEditor")
         act_allergens = self.ui.findChild(QAction, "actionAllergensEditor")
@@ -50,7 +50,7 @@ class MainWindow:
         # Stacked central
         self.stack: QStackedWidget | None = self.ui.findChild(QStackedWidget, "stack")
 
-        # Abre por defecto el editor de BD
+        # Opens DB Editor by default
         self.open_db_editor()
 
     # ---------- helpers ----------
@@ -71,11 +71,11 @@ class MainWindow:
         return f"MenusApp — Perfil: {prof}"
 
     def _switch_profile(self) -> None:
-        """Reinstancia el Repo al perfil activo y refresca vistas abiertas."""
+        """Reinitialize the Repo to the active profile and refresh open views."""
         self.repo = Repo(ensure_profile_root())
         self.ui.setWindowTitle(self._title_with_profile())
 
-        # Refrescar el widget activo si soporta set_repo/refresh
+        # Refresh the active widget if it supports set_repo/refresh.
         cw = self.ui.centralWidget() if self.stack is None else self.stack.currentWidget()
         if cw is None:
             return
@@ -127,10 +127,10 @@ class MainWindow:
         from widgets.preferences import PreferencesDialog
 
         dlg = PreferencesDialog(self.repo, self.ui)
-        # recarga ON THE GO cuando cambie/cree perfil
+        # On-the-go reload when a profile is changed/created.
         dlg.profile_changed.connect(lambda *_: self._switch_profile())
         if dlg.exec():
-            # por si el cambio se aplicó al pulsar OK
+            # In case the change was applied when pressing OK.
             self._switch_profile()
 
     def show_about(self) -> None:
