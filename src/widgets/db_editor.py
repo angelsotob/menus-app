@@ -53,20 +53,21 @@ class DbEditor(QWidget):
         self.ui.tblFoods.resizeColumnsToContents()
 
         # filters
+        self.ui.cmbCategory.clear()
         for disp, val in [
-            ("(Todas)", "(All)"),
-            ("Proteína", "Protein"),
-            ("Verduras", "Vegetables"),
-            ("Fruta", "Fruit"),
-            ("Cereales", "Cereals"),
-            ("Legumbres", "Legumes"),
-            ("Pescado", "Fish"),
-            ("Marisco", "Seafood"),
-            ("Huevos", "Eggs"),
-            ("Lácteos", "Milk"),
-            ("Frutos secos", "Nuts"),
-            ("Grasas", "Fats"),
-            ("Otros", "Others"),
+            ("(Todas)", "(Todas)"),
+            ("Cereales", "Cereales"),
+            ("Fruta", "Fruta"),
+            ("Frutos secos", "Frutos secos"),
+            ("Grasas", "Grasas"),
+            ("Huevos", "Huevos"),
+            ("Lácteos", "Lácteos"),
+            ("Legumbres", "Legumbres"),
+            ("Marisco", "Marisco"),
+            ("Otros", "Otros"),
+            ("Pescado", "Pescado"),
+            ("Proteína", "Proteína"),
+            ("Vegetales", "Vegetales"),
         ]:
             self.ui.cmbCategory.addItem(disp, val)
 

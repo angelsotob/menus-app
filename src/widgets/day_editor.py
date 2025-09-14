@@ -25,19 +25,17 @@ from core.config import get_selected_profile
 from core.export_qt import export_widget_to_image, export_widget_to_pdf
 from core.models import DayMeals, DayMenu, Food
 from core.repository import Repo
+from core.rules_engine import RulesEngine, format_violations
 from ui import load_ui
-from widgets.food_dialog import CAT_I18N
 from widgets.print_views import DayPrintView
 
 
 def _profile_tag() -> str:
     p = get_selected_profile() or "default"
-    # filename-safe: only alphanumeric, hyphen and underscore
     safe = "".join(c for c in p if c.isalnum() or c in "-_").strip()
     return safe or "default"
 
 
-# User roles to save data in QListWidgetItem (avoid collisions with Qt roles)
 ROLE_CAT = Qt.UserRole + 1
 ROLE_FID = Qt.UserRole + 2
 
@@ -70,11 +68,10 @@ class PickFoodDialog(QDialog):
         form = QFormLayout()
         self.cmbCat = QComboBox()
         self.cmbFood = QComboBox()
-        # Suggested categories from categories.json — show ES, keep EN as userData
+        # Mostrar ES, guardar valor interno como userData
         self.cmbCat.clear()
-        for internal in self.repo.default_cats_for(meal_key):  # e.g. ["Cereals","Milk",...]
-            display = CAT_I18N.get(internal, internal)
-            self.cmbCat.addItem(display, internal)
+        for cat_es in self.repo.default_cats_for(meal_key):
+            self.cmbCat.addItem(cat_es, cat_es)
         form.addRow(QLabel("Categoría:"), self.cmbCat)
         form.addRow(QLabel("Alimento:"), self.cmbFood)
         layout.addLayout(form)
@@ -85,10 +82,9 @@ class PickFoodDialog(QDialog):
         bb.rejected.connect(self.reject)
 
         self.cmbCat.currentTextChanged.connect(self._reload_foods)
-        self._reload_foods(self.cmbCat.currentText())
+        self._reload_foods()
 
         if current:
-            # current.category is the internal value (EN)
             idx = -1
             for i in range(self.cmbCat.count()):
                 if self.cmbCat.itemData(i) == current.category:
@@ -107,12 +103,12 @@ class PickFoodDialog(QDialog):
     def _foods_for_category(self, cat: str) -> list[Food]:
         return [f for f in self.repo.list_foods() if f.category == cat and f.active]
 
-    def _reload_foods(self, _unused=None) -> None:
+    def _reload_foods(self) -> None:
         self.cmbFood.clear()
         internal_cat = self.cmbCat.currentData() or self.cmbCat.currentText()
         foods = self._foods_for_category(internal_cat)
         for f in foods:
-            self.cmbFood.addItem(f.nombre if hasattr(f, "nombre") else f.name, f.id)
+            self.cmbFood.addItem(f.name, f.id)
 
     def _accept(self) -> None:
         cat = self.cmbCat.currentData() or self.cmbCat.currentText()
@@ -132,7 +128,7 @@ class DayEditor(QWidget):
         self.repo = repo
         self._refresh_foods_map()
 
-        # Buttons connection
+        # Botones
         self.ui.btnAddBre.clicked.connect(lambda: self._add_to(self.ui.lstBreakfast, "breakfast"))
         self.ui.btnEditBre.clicked.connect(lambda: self._edit_in(self.ui.lstBreakfast, "breakfast"))
         self.ui.btnDelBre.clicked.connect(lambda: self._del_in(self.ui.lstBreakfast))
@@ -159,16 +155,14 @@ class DayEditor(QWidget):
         self.ui.btnLoad.clicked.connect(self._load_day)
         self.ui.btnExportPdf.clicked.connect(lambda: self._export("pdf"))
         self.ui.btnExportImg.clicked.connect(lambda: self._export("img"))
+        self.ui.btnValidate.clicked.connect(self._validate_day)
 
-        # Initial label
         self._relabel_all()
 
     def set_repo(self, repo: Repo) -> None:
-        """Point the editor to the new repo and refresh names."""
         self.repo = repo
         self._relabel_all()
 
-    # ------ helpers de relabel ------
     def _refresh_foods_map(self) -> None:
         self._foods_by_id = {f.id: f for f in self.repo.list_foods()}
 
@@ -187,12 +181,10 @@ class DayEditor(QWidget):
         self._relabel_list(self.ui.lstSnack)
         self._relabel_list(self.ui.lstDinner)
 
-    # ------ Qt events ------
     def showEvent(self, e) -> None:  # type: ignore[override]
         super().showEvent(e)
         self._relabel_all()
 
-    # ----- helpers de items -----
     def _items_of(self, lst: QListWidget) -> list[MealItem]:
         out: list[MealItem] = []
         for i in range(lst.count()):
@@ -243,7 +235,6 @@ class DayEditor(QWidget):
             lst.takeItem(lst.row(it))
             self._relabel_all()
 
-    # ----- persistence -----
     def to_day_meals(self) -> DayMeals:
         return DayMeals(
             breakfast=[i.food_id for i in self._items_of(self.ui.lstBreakfast)],
@@ -296,7 +287,7 @@ class DayEditor(QWidget):
         def to_items(ids: Iterable[str]) -> list[MealItem]:
             return [
                 MealItem(
-                    self._foods_by_id[i].category if i in self._foods_by_id else "others",
+                    self._foods_by_id[i].category if i in self._foods_by_id else "Otros",
                     i,
                 )
                 for i in ids
@@ -310,7 +301,6 @@ class DayEditor(QWidget):
         QMessageBox.information(self, "Cargado", f"Menú diario cargado desde:\n{fn}")
         self._relabel_all()
 
-    # ----- export -----
     def _export(self, kind: str) -> None:
         day = self.to_day_meals()
         print_view = DayPrintView(self._foods_by_id, day, parent=None)
@@ -343,3 +333,19 @@ class DayEditor(QWidget):
             fmt = "PNG" if fn.lower().endswith(".png") else "JPG"
             export_widget_to_image(print_view, fn, fmt=fmt, scale=2.0)
             QMessageBox.information(self, "Exportado", f"Exportado a imagen:\n{fn}")
+
+    # ---------- validate ----------
+    def _validate_day(self) -> None:
+        """Validate current day against rules."""
+        from datetime import date
+
+        from core.models import DayMenu
+
+        dm = self.to_day_meals()  # -> DayMeals
+        day_menu = DayMenu(date=date.today(), meals=dm)  # envolver en DayMenu
+
+        rules = self.repo.load_rules()
+        engine = RulesEngine(self.repo)
+        violations = engine.validate_day(day_menu, rules)  # ahora sí: DayMenu + rules
+        msg = format_violations(violations)
+        QMessageBox.information(self, "Validación de reglas", msg or "Todo correcto ✅")

@@ -10,6 +10,7 @@ from core.config import get_selected_profile
 from core.export_qt import export_widget_to_image, export_widget_to_pdf
 from core.models import WeekMenu
 from core.repository import Repo
+from core.rules_engine import RulesEngine, format_violations
 from ui import load_ui
 from widgets.day_editor import DayEditor, MealItem
 from widgets.print_views import WeekPrintView
@@ -27,7 +28,6 @@ TAB_LAYOUT_NAMES = [
 
 
 def monday_of(d: date) -> date:
-    """Return the Monday of d's week."""
     return d - timedelta(days=d.weekday())
 
 
@@ -41,7 +41,7 @@ class WeekPlanner(QWidget):
     def __init__(self, repo: Repo, parent=None) -> None:
         super().__init__(parent)
         self.ui = load_ui("week_planner.ui")
-        self.setLayout(self.ui.layout())  # Inherit the .ui layout
+        self.setLayout(self.ui.layout())
         self.repo = repo
 
         # One DayEditor per tab
@@ -57,13 +57,13 @@ class WeekPlanner(QWidget):
         self.ui.btnLoad.clicked.connect(self._load_week)
         self.ui.btnExportPdf.clicked.connect(lambda: self._export("pdf"))
         self.ui.btnExportImg.clicked.connect(lambda: self._export("img"))
+        self.ui.btnValidate.clicked.connect(self._validate_week)
 
         # foods map to export
         self._foods_by_id = {f.id: f for f in self.repo.list_foods()}
 
     # ---------- helpers ----------
     def to_week_menu(self) -> WeekMenu:
-        """Convert the 7 DayEditors into a WeekMenu."""
         days = {}
         for key in DAY_KEYS:
             ed = self._editors[key]
@@ -72,7 +72,6 @@ class WeekPlanner(QWidget):
         return WeekMenu(week_start=start, days=days)
 
     def _set_day_from_ids(self, key: str, ids_by_meal: dict[str, list[str]]) -> None:
-        """Set a specific day in its DayEditor from meal IDs."""
         ed = self._editors[key]
 
         def to_items(ids: list[str]) -> list[MealItem]:
@@ -82,7 +81,8 @@ class WeekPlanner(QWidget):
                 if fid in foods_by_id:
                     items.append(MealItem(foods_by_id[fid].category, fid))
                 else:
-                    items.append(MealItem("otros", fid))
+                    # Fallback de categoría interno (ES)
+                    items.append(MealItem("Otros", fid))
             return items
 
         ed._set_items(ed.ui.lstBreakfast, to_items(ids_by_meal.get("breakfast", [])))
@@ -117,7 +117,6 @@ class WeekPlanner(QWidget):
         text = json.dumps(data, indent=2, ensure_ascii=False)
         path.write_text(text, encoding="utf-8")
 
-        # Optional: also persist some internal reference.
         try:
             self.repo.save_rules({"last_saved_week": str(path)})
         except Exception:
@@ -186,3 +185,16 @@ class WeekPlanner(QWidget):
             fmt = "PNG" if fn.lower().endswith(".png") else "JPG"
             export_widget_to_image(print_view, fn, fmt=fmt, scale=2.0)
             QMessageBox.information(self, "Exportado", f"Semana exportada a imagen:\n{fn}")
+
+    # ---------- validate ----------
+
+    def _validate_week(self) -> None:
+        """Validate current week against rules."""
+        wm = self.to_week_menu()
+        rules = self.repo.load_rules()
+        engine = RulesEngine(self.repo)
+        # orden correcto: (week, rules)
+        violations = engine.validate_week(wm, rules)
+        # sin scope=
+        msg = format_violations(violations)
+        QMessageBox.information(self, "Validación de reglas (semana)", msg or "Todo correcto ✅")

@@ -69,6 +69,7 @@
      <item><widget class="QPushButton" name="btnSave"><property name="text"><string>Guardar semana</string></property></widget></item>
      <item><widget class="QPushButton" name="btnExportPdf"><property name="text"><string>Exportar PDF</string></property></widget></item>
      <item><widget class="QPushButton" name="btnExportImg"><property name="text"><string>Exportar Imagen</string></property></widget></item>
+     <item><widget class="QPushButton" name="btnValidate"><property name="text"><string>Validar</string></property></widget></item>
     </layout>
    </item>
   </layout>

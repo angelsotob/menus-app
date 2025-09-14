@@ -1,9 +1,11 @@
+# src/core/repository.py
 from __future__ import annotations
 
 import json
 import os
 import shutil
 import tempfile
+from collections.abc import Iterable
 from pathlib import Path
 
 from core.config import ensure_data_dir
@@ -11,11 +13,19 @@ from core.models import DayMenu, Food, WeekMenu
 
 
 class Repo:
+    """
+    Repositorio de datos con **persistencia y modelo interno en español (ES)**.
+
+    - Al LEER JSON del perfil (foods/categories/rules): se cargan tal cual (ES).
+    - Al ESCRIBIR: se guardan tal cual (ES).
+    - APIs devuelven/aceptan categorías en ES.
+    """
+
     def __init__(self, root: Path | None = None):
         self.root = root or ensure_data_dir()
         (self.root / "backups").mkdir(parents=True, exist_ok=True)
 
-    # ---------- utility ----------
+    # ---------- utilities ----------
     def _file(self, name: str) -> Path:
         return self.root / name
 
@@ -26,12 +36,6 @@ class Repo:
         return json.loads(p.read_text(encoding="utf-8"))
 
     def _atomic_write(self, path: Path, data: dict) -> None:
-        """
-        Atomic JSON write:
-        - Backup previous file (if any) into backups/
-        - Write to a temp file in the same directory
-        - Replace destination atomically
-        """
         if path.exists():
             (self.root / "backups").mkdir(parents=True, exist_ok=True)
             shutil.copy2(path, self.root / "backups" / f"{path.stem}.bak.json")
@@ -46,12 +50,10 @@ class Repo:
                 json.dump(data, f, ensure_ascii=False, indent=2)
             Path(tmp_name).replace(path)
         finally:
-            # ensure fd is closed if os.fdopen failed early
             try:
                 os.close(fd)
             except OSError:
                 pass
-            # best-effort cleanup if temp still exists
             try:
                 ptmp = Path(tmp_name)
                 if ptmp.exists():
@@ -59,13 +61,32 @@ class Repo:
             except Exception:
                 pass
 
-    # ---------- foods ----------
+    # ---------- foods (ES <-> ES) ----------
     def list_foods(self) -> list[Food]:
         data = self._read_json("foods.json")
-        return [Food.model_validate(i) for i in data.get("foods", [])]
+        foods_raw = data.get("foods", [])
+        out: list[Food] = []
+        for i in foods_raw:
+            out.append(Food.model_validate(i))
+        return out
 
-    def save_foods(self, foods: list[Food]) -> None:
-        data = {"version": 1, "foods": [f.model_dump() for f in foods]}
+    def save_foods(self, foods: Iterable[Food | dict]) -> None:
+        # Permite Food o dict (para tests/semillas rápidas)
+        foods_es: list[dict] = []
+        for f in foods:
+            obj = f if isinstance(f, Food) else Food.model_validate(f)
+            foods_es.append(
+                {
+                    "id": obj.id,
+                    "name": obj.name,
+                    "category": obj.category,  # ES
+                    "allergens": obj.allergens,
+                    "labels": obj.labels,
+                    "notes": obj.notes,
+                    "active": obj.active,
+                }
+            )
+        data = {"version": 1, "foods": foods_es}
         self._atomic_write(self._file("foods.json"), data)
 
     # ---------- allergens ----------
@@ -83,7 +104,7 @@ class Repo:
     def save_rules(self, rules: dict) -> None:
         self._atomic_write(self._file("rules.json"), rules)
 
-    # ---------- menus ----------
+    # ---------- menus (sin traducciones; solo IDs) ----------
     def save_day_menu(self, menu: DayMenu, name: str) -> None:
         d = {"date": str(menu.date), "meals": menu.meals.model_dump()}
         self._atomic_write(self._file(f"{name}.day.menu.json"), d)
@@ -95,32 +116,32 @@ class Repo:
         }
         self._atomic_write(self._file(f"{name}.week.menu.json"), d)
 
-    # ---------- categories ----------
+    # ---------- categories (ES) ----------
     def _ensure_categories_file(self) -> Path:
         p = self._file("categories.json")
         if not p.exists():
-            default = {
+            default_es = {
                 "version": 1,
                 "categories": [
-                    "Proteina",
-                    "Pescado",
-                    "Marisco",
-                    "Vegetales",
-                    "Fruta",
-                    "Legumbres",
                     "Cereales",
+                    "Fruta",
                     "Lácteos",
+                    "Legumbres",
+                    "Marisco",
                     "Otros",
+                    "Pescado",
+                    "Proteína",
+                    "Vegetales",
                 ],
                 "by_meal": {
-                    "breakfast": ["Cereales", "Lácteos", "Fruta", "Otros"],
-                    "midmorning": ["Fruta", "Proteina", "Otros"],
-                    "lunch": ["Proteina", "Vegetales", "Cereales", "Legumbres", "Otros"],
+                    "breakfast": ["Cereales", "Fruta", "Lácteos", "Otros"],
+                    "midmorning": ["Fruta", "Otros", "Proteína"],
+                    "lunch": ["Cereales", "Legumbres", "Otros", "Proteína", "Vegetales"],
                     "snack": ["Fruta", "Lácteos", "Otros"],
-                    "dinner": ["Pescado", "Proteina", "Vegetales", "Otros"],
+                    "dinner": ["Otros", "Pescado", "Proteína", "Vegetales"],
                 },
             }
-            self._atomic_write(p, default)
+            self._atomic_write(p, default_es)
         return p
 
     def load_categories_config(self) -> dict:
@@ -130,12 +151,13 @@ class Repo:
     def save_categories_config(self, cfg: dict) -> None:
         self._atomic_write(self._ensure_categories_file(), cfg)
 
+    # --------- APIs de conveniencia (interno ES) ----------
     def list_categories(self) -> list[str]:
-        cfg = self.load_categories_config()
-        cats = list(cfg.get("categories", []))
+        cfg_es = self.load_categories_config()
+        cats = list(cfg_es.get("categories", []))
         if not cats:
-            cats = sorted({f.category for f in self.list_foods()})
-        # Dedup preservando orden
+            return sorted({f.category for f in self.list_foods()})
+        # dedup preservando orden
         seen: set[str] = set()
         out: list[str] = []
         for c in cats:
@@ -145,14 +167,15 @@ class Repo:
         return out
 
     def default_cats_for(self, meal_key: str) -> list[str]:
-        cfg = self.load_categories_config()
-        por = cfg.get("by_meal", {})
-        cats = por.get(meal_key, [])
-        if not cats:
-            cats = ["Otros"] if "Otros" in self.list_categories() else self.list_categories()
-        return cats
+        cfg_es = self.load_categories_config()
+        by_es = cfg_es.get("by_meal", {})
+        arr = by_es.get(meal_key, [])
+        if not arr:
+            all_es = self.list_categories()
+            return ["Otros"] if "Otros" in all_es else all_es
+        return list(arr)
 
-    # ---------- categories synchronization <-> foods ----------
+    # ---------- categories sincronización <-> foods ----------
     def rename_category_in_foods(self, old: str, new: str) -> int:
         foods = self.list_foods()
         count = 0
@@ -165,13 +188,6 @@ class Repo:
         return count
 
     def remap_deleted_category(self, deleted: str, fallback: str = "Otros") -> int:
-        """
-        When you delete a category, move foods with that category to `fallback` (if it exists).
-        Returns how many were changed. If fallback doesn't exist, returns 0.
-        """
-        cats = set(self.list_categories())
-        if fallback not in cats:
-            return 0
         foods = self.list_foods()
         count = 0
         for f in foods:

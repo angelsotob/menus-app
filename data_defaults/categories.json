@@ -1,21 +1,21 @@
 {
   "version": 1,
   "categories": [
-    "Proteina",
-    "Pescado",
-    "Marisco",
-    "Vegetales",
-    "Fruta",
-    "Legumbres",
     "Cereales",
+    "Fruta",
     "Lácteos",
-    "Otros"
+    "Legumbres",
+    "Marisco",
+    "Otros",
+    "Pescado",
+    "Proteína",
+    "Vegetales"
   ],
   "by_meal": {
-    "breakfast": ["Cereales", "Lácteos", "Fruta", "Otros"],
-    "midmorning": ["Fruta", "Proteina", "Otros"],
-    "lunch": ["Proteina", "Vegetales", "Cereales", "Legumbres", "Otros"],
+    "breakfast": ["Cereales", "Fruta", "Lácteos", "Otros"],
+    "midmorning": ["Fruta", "Otros", "Proteína"],
+    "lunch": ["Cereales", "Legumbres", "Otros", "Proteína", "Vegetales"],
     "snack": ["Fruta", "Lácteos", "Otros"],
-    "dinner": ["Pescado", "Proteina", "Vegetales", "Otros"]
+    "dinner": ["Otros", "Pescado", "Proteína", "Vegetales"]
   }
 }

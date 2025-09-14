@@ -202,13 +202,13 @@ class CategoriesEditor(QDialog):
         self._set_by_meal(mapping)
 
         # remap foods from deleted category to 'Others' if exist
-        moved = self.repo.remap_deleted_category(name, fallback="Others")
+        moved = self.repo.remap_deleted_category(name, fallback="Otros")
         if moved:
             self._foods_affected = True
             QMessageBox.information(
                 self,
                 "Alimentos actualizados",
-                f"Movidos {moved} alimento(s) de '{name}' a 'otros'.",
+                f"Movidos {moved} alimento(s) de '{name}' a 'Otros'.",
             )
 
         self._reload_globals()

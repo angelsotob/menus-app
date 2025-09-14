@@ -1,11 +1,82 @@
 {
   "version": 1,
   "daily": [
-    { "type": "category_count", "category": "Vegetables", "op": ">=", "quantity": 2 },
-    { "type": "forbid_allergen", "allergen": "Gluten" }
+    {
+      "type": "category_count",
+      "category": "Vegetales",
+      "op": ">=",
+      "quantity": 2,
+      "userland": "Añade {op_word} {quantity} raciones de {category} (hoy: {found})."
+    },
+    {
+      "type": "category_count",
+      "category": "Fruta",
+      "op": ">=",
+      "quantity": 1,
+      "userland": "Incluye {op_word} {quantity} ración de {category} (hoy: {found})."
+    },
+    {
+      "type": "category_count",
+      "category": "Proteína",
+      "op": ">=",
+      "quantity": 1,
+      "userland": "Debes tener {op_word} {quantity} en {category} (hoy: {found})."
+    },
+    {
+      "type": "category_count",
+      "category": "Cereales",
+      "op": "<=",
+      "quantity": 2,
+      "userland": "{category}: {op_word} {quantity} por día (hoy: {found})."
+    },
+    {
+      "type": "category_count",
+      "category": "Lácteos",
+      "op": "<=",
+      "quantity": 1,
+      "userland": "{category}: {op_word} {quantity} ración diaria (hoy: {found})."
+    },
+    {
+      "type": "forbid_allergen",
+      "allergen": "Gluten",
+      "userland": "Evitar alérgeno \"{allergen}\" en el día."
+    }
   ],
   "weekly": [
-    { "type": "category_count", "category": "Fish", "op": ">=", "quantity": 2 },
-    { "type": "do_not_repeat_consecutive_item", "name": "Salmón" }
+    {
+      "type": "category_count",
+      "category": "Pescado",
+      "op": ">=",
+      "quantity": 2,
+      "userland": "En la semana: {category} {op_word} {quantity} (total: {found})."
+    },
+    {
+      "type": "category_count",
+      "category": "Legumbres",
+      "op": ">=",
+      "quantity": 3,
+      "userland": "En la semana: {category} {op_word} {quantity} (total: {found})."
+    },
+    {
+      "type": "category_count",
+      "category": "Fruta",
+      "op": ">=",
+      "quantity": 7,
+      "userland": "En la semana: {category} {op_word} {quantity} (total: {found})."
+    },
+    {
+      "type": "category_count",
+      "category": "Vegetales",
+      "op": ">=",
+      "quantity": 10,
+      "userland": "En la semana: {category} {op_word} {quantity} (total: {found})."
+    },
+    {
+      "type": "category_count",
+      "category": "Proteína",
+      "op": "<=",
+      "quantity": 14,
+      "userland": "En la semana: {category} {op_word} {quantity} (total: {found})."
+    }
   ]
 }

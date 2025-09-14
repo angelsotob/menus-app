@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>RulesEditor</class>
+ <widget class="QDialog" name="RulesEditor">
+  <property name="windowTitle">
+   <string>Editor de reglas</string>
+  </property>
+  <property name="minimumSize">
+   <size><width>760</width><height>560</height></size>
+  </property>
+
+  <layout class="QVBoxLayout" name="verticalLayout">
+
+   <!-- Constructor de reglas -->
+   <item>
+    <layout class="QGridLayout" name="builderGrid">
+     <item row="0" column="0">
+      <widget class="QLabel" name="lblScope">
+       <property name="text"><string>Ámbito</string></property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QComboBox" name="cmbScope"/>
+     </item>
+
+     <item row="0" column="2">
+      <widget class="QLabel" name="lblType">
+       <property name="text"><string>Tipo</string></property>
+      </widget>
+     </item>
+     <item row="0" column="3">
+      <widget class="QComboBox" name="cmbType"/>
+     </item>
+
+     <item row="1" column="0">
+      <widget class="QLabel" name="lblCategory">
+       <property name="text"><string>Categoría</string></property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QComboBox" name="cmbCategory"/>
+     </item>
+
+     <item row="1" column="2">
+      <widget class="QLabel" name="lblFood">
+       <property name="text"><string>Alimento</string></property>
+      </widget>
+     </item>
+     <item row="1" column="3">
+      <widget class="QComboBox" name="cmbFood"/>
+     </item>
+
+     <item row="2" column="0">
+      <widget class="QLabel" name="lblOp">
+       <property name="text"><string>Operador</string></property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QComboBox" name="cmbOp"/>
+     </item>
+
+     <item row="2" column="2">
+      <widget class="QLabel" name="lblQty">
+       <property name="text"><string>Cantidad</string></property>
+      </widget>
+     </item>
+     <item row="2" column="3">
+      <widget class="QSpinBox" name="spnQty">
+       <property name="minimum"><number>0</number></property>
+       <property name="maximum"><number>999</number></property>
+       <property name="value"><number>1</number></property>
+      </widget>
+     </item>
+
+     <item row="3" column="0">
+      <widget class="QPushButton" name="btnAddRule">
+       <property name="text"><string>Añadir regla</string></property>
+      </widget>
+     </item>
+     <item row="3" column="1" colspan="3">
+      <widget class="QLabel" name="lblHint">
+       <property name="text">
+        <string>Nota: “Alimento = Todos” ignora el nombre concreto. Deja “Categoría” vacía para que cuente en cualquier categoría.</string>
+       </property>
+       <property name="wordWrap"><bool>true</bool></property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+
+   <!-- Panel legible (lista de reglas) -->
+   <item>
+    <widget class="QGroupBox" name="viewerPanel">
+     <property name="title">
+      <string>Reglas</string>
+     </property>
+     <layout class="QVBoxLayout">
+      <item>
+       <widget class="QTabWidget" name="tabsRules">
+        <widget class="QWidget" name="tabDaily">
+         <attribute name="title">
+          <string>Diarias</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="layoutDaily">
+          <item><widget class="QListWidget" name="lstDailyRules"/></item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="tabWeekly">
+         <attribute name="title">
+          <string>Semanales</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="layoutWeekly">
+          <item><widget class="QListWidget" name="lstWeeklyRules"/></item>
+         </layout>
+        </widget>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+
+   <!-- Visor/Editor JSON (ocultable) -->
+   <item>
+    <widget class="QPlainTextEdit" name="txtJson">
+     <property name="placeholderText">
+      <string>{ "version":1, "daily": [...], "weekly": [...] }</string>
+     </property>
+     <property name="tabChangesFocus"><bool>false</bool></property>
+     <property name="minimumSize">
+      <size><width>680</width><height>280</height></size>
+     </property>
+    </widget>
+   </item>
+
+   <!-- Botonera -->
+   <item>
+    <layout class="QHBoxLayout" name="rowButtons">
+     <item>
+      <widget class="QPushButton" name="btnLoadDefaults">
+       <property name="text"><string>Cargar valores por defecto</string></property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnReloadFromFile">
+       <property name="text"><string>Recargar desde archivo</string></property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnToggleJson">
+       <property name="text"><string>Ver JSON</string></property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="sp1">
+       <property name="orientation"><enum>Qt::Horizontal</enum></property>
+       <property name="sizeHint" stdset="0">
+        <size><width>40</width><height>20</height></size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Ok|QDialogButtonBox::Cancel</set>
+     </property>
+    </widget>
+   </item>
+
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

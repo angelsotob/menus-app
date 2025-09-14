@@ -14,9 +14,9 @@ from core.models import DayMeals, Food, WeekMenu
 
 
 class DayPrintView(QWidget):
-    """Clean table to export a day (fixed-width items column with wrapping)."""
+    """Tabla limpia para exportar un día (ancho fijo + word-wrap)."""
 
-    HEADERS = ["Meal", "Elements"]
+    HEADERS = ["Comida", "Elementos"]
 
     def __init__(self, foods_by_id: dict[str, Food], day: DayMeals, parent=None) -> None:
         super().__init__(parent)
@@ -28,11 +28,9 @@ class DayPrintView(QWidget):
         tbl = QTableWidget(5, 2, self)
         tbl.setHorizontalHeaderLabels(self.HEADERS)
 
-        # Configure fixed column width and wrap
         tbl.setWordWrap(True)
         hdr: QHeaderView = tbl.horizontalHeader()
         hdr.setSectionResizeMode(QHeaderView.Fixed)
-        # Column 0 narrower for the meal label; column 1 fixed for wrapped text.
         tbl.setColumnWidth(0, 140)
         tbl.setColumnWidth(1, 600)
 
@@ -60,10 +58,10 @@ class DayPrintView(QWidget):
 
 
 class WeekPrintView(QWidget):
-    """ "Clean grid to export a week with fixed column width and wrapping."""
+    """Cuadrícula limpia para exportar una semana (ancho fijo por día + word-wrap)."""
 
-    MEALS = ["Breakfast", "Midmorning", "Lunch", "Snack", "Dinner"]
-    DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    MEALS = ["Desayuno", "Media mañana", "Comida", "Merienda", "Cena"]
+    DAYS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
 
     def __init__(self, foods_by_id: dict[str, Food], week: WeekMenu, parent=None) -> None:
         super().__init__(parent)
@@ -76,16 +74,13 @@ class WeekPrintView(QWidget):
         tbl.setHorizontalHeaderLabels(self.DAYS)
         tbl.setVerticalHeaderLabels(self.MEALS)
 
-        # Set fixed width and uniform wrapping per day.
         tbl.setWordWrap(True)
         hdr_h: QHeaderView = tbl.horizontalHeader()
         hdr_h.setSectionResizeMode(QHeaderView.Fixed)
-        # Fixed width per day (adjust if you want more/less text per column).
         fixed_day_width = 170
         for c in range(len(self.DAYS)):
             tbl.setColumnWidth(c, fixed_day_width)
 
-        # Set row height based on content.
         hdr_v: QHeaderView = tbl.verticalHeader()
         hdr_v.setSectionResizeMode(QHeaderView.ResizeToContents)
 
