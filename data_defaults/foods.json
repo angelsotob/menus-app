@@ -4,8 +4,8 @@
     {
       "id": "food_0001",
       "name": "Salmón",
-      "category": "Fish",
-      "allergens": ["Fish"],
+      "category": "Pescado",
+      "allergens": ["Pescado"],
       "labels": ["omega3", "rápido"],
       "notes": "Plancha o al horno",
       "active": true
@@ -13,7 +13,7 @@
     {
       "id": "food_0002",
       "name": "Brécol",
-      "category": "Vegetables",
+      "category": "Vegetales",
       "allergens": [],
       "labels": ["fibra"],
       "notes": null,

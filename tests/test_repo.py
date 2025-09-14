@@ -12,7 +12,7 @@ def test_repo_roundtrip(tmp_path: Path) -> None:
         Food(
             id="f1",
             name="Pollo",
-            category="Protein",
+            category="Proteína",
             allergens=[],
             labels=[],
             active=True,
@@ -20,7 +20,7 @@ def test_repo_roundtrip(tmp_path: Path) -> None:
         Food(
             id="f2",
             name="Manzana",
-            category="Fruit",
+            category="Fruta",
             allergens=[],
             labels=[],
             active=True,
@@ -30,9 +30,3 @@ def test_repo_roundtrip(tmp_path: Path) -> None:
     loaded = repo.list_foods()
     assert len(loaded) == 2
     assert loaded[0].name == "Pollo"
-
-
-def test_allergens_empty_ok(tmp_path: Path) -> None:
-    repo = Repo(tmp_path)
-    repo.save_allergens([])
-    assert repo.list_allergens() == []

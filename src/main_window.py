@@ -9,18 +9,18 @@ from ui import load_ui
 
 
 class MainWindow:
-    """Wrapper over the QMainWindow loaded from .ui."""
+    """Wrapper sobre el QMainWindow cargado desde .ui."""
 
     def __init__(self) -> None:
-        self.ui: QMainWindow = load_ui("main_window.ui")  # is a QMainWindow
+        self.ui: QMainWindow = load_ui("main_window.ui")  # es un QMainWindow
         self.repo = Repo(ensure_profile_root())
         self.ui.setWindowTitle(self._title_with_profile())
 
-        # Ensures status bar
+        # Barra de estado garantizada
         if self.ui.statusBar() is None:
             self.ui.setStatusBar(QStatusBar(self.ui))
 
-        # Menu actions
+        # Acciones de menú
         act_exit = self.ui.findChild(QAction, "actionExit")
         act_db = self.ui.findChild(QAction, "actionOpenDbEditor")
         act_allergens = self.ui.findChild(QAction, "actionAllergensEditor")
@@ -29,6 +29,7 @@ class MainWindow:
         act_day = self.ui.findChild(QAction, "actionOpenDayEditor")
         act_week = self.ui.findChild(QAction, "actionOpenWeekPlanner")
         act_cats = self.ui.findChild(QAction, "actionCategoriesEditor")
+        act_rules = self.ui.findChild(QAction, "actionRulesEditor")
 
         if act_exit:
             act_exit.triggered.connect(self.ui.close)
@@ -46,11 +47,13 @@ class MainWindow:
             act_week.triggered.connect(self.open_week_planner)
         if act_cats:
             act_cats.triggered.connect(self.open_categories_editor)
+        if act_rules:
+            act_rules.triggered.connect(self.open_rules_editor)
 
         # Stacked central
         self.stack: QStackedWidget | None = self.ui.findChild(QStackedWidget, "stack")
 
-        # Opens DB Editor by default
+        # Abre DB Editor por defecto
         self.open_db_editor()
 
     # ---------- helpers ----------
@@ -71,11 +74,10 @@ class MainWindow:
         return f"MenusApp — Perfil: {prof}"
 
     def _switch_profile(self) -> None:
-        """Reinitialize the Repo to the active profile and refresh open views."""
+        """Reinicializa Repo al perfil activo y refresca vistas."""
         self.repo = Repo(ensure_profile_root())
         self.ui.setWindowTitle(self._title_with_profile())
 
-        # Refresh the active widget if it supports set_repo/refresh.
         cw = self.ui.centralWidget() if self.stack is None else self.stack.currentWidget()
         if cw is None:
             return
@@ -127,10 +129,8 @@ class MainWindow:
         from widgets.preferences import PreferencesDialog
 
         dlg = PreferencesDialog(self.repo, self.ui)
-        # On-the-go reload when a profile is changed/created.
         dlg.profile_changed.connect(lambda *_: self._switch_profile())
         if dlg.exec():
-            # In case the change was applied when pressing OK.
             self._switch_profile()
 
     def show_about(self) -> None:
@@ -157,3 +157,9 @@ class MainWindow:
         dlg = CategoriesEditor(self.repo, self.ui)
         if dlg.exec():
             self._status("Categorías actualizadas", 2500)
+
+    def open_rules_editor(self) -> None:
+        from widgets.rules_editor import RulesEditor
+
+        dlg = RulesEditor(self.repo, self.ui)
+        dlg.exec()
