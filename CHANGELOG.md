@@ -17,7 +17,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [5.0.0] - 2025-09-12
+## [0.6.0] — 2025-09-14
+### Added
+- Rules Editor UI:
+  - Guided rule builder with scope selection (daily/weekly), type, category, food, operator, and quantity.
+  - Ability to add rule types:
+    - **Category count**  
+    - **Item count**  
+    - **Forbid allergen**  
+    - **Do not repeat item on consecutive days**
+  - Optional JSON view with *View JSON* button.
+  - Default rules based on nutritional recommendations.
+  - Intuitive natural-language style display (e.g., *“There should be at least 2 vegetables in the menu daily”*).
+
+### Changed
+- Validation engine updated to support:
+  - Rules by category and specific food.
+  - Conversion between operator text (`greater or equal than`, `less or equal than`, etc.) and symbols (`>=`, `<=`).
+  - Check for consecutive items at the weekly level.
+
+### Fixed
+- Fixed visualization and normalization issues when saving rules.
+
+---
+
+## [0.5.0] - 2025-09-12
 ### Added
 - Full translation of the application to English (UI texts, models, configuration files).
 - Consistent use of internal category keys (English) with localized display names.
@@ -123,10 +147,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## License
 This project is licensed under **CC BY-NC 4.0**.
 
-[Unreleased]: https://github.com/owner/repo/compare/v0.5.0...HEAD
-[0.5.0]: https://github.com/owner/repo/compare/v0.4.2...v0.5.0
-[0.4.2]: https://github.com/owner/repo/compare/v0.4.1...v0.4.2
-[0.4.1]: https://github.com/OWNER/REPO/compare/v0.4.0...v0.4.1
+[Unreleased]: https://github.com/angelsotob/menus-app/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/angelsotob/menus-app/compare/v0.5.0...v0.6.0
+[0.5.0]: https://github.com/angelsotob/menus-app/compare/v0.4.2...v0.5.0
+[0.4.2]: https://github.com/angelsotob/menus-app/compare/v0.4.1...v0.4.2
+[0.4.1]: https://github.com/angelsotob/menus-app/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/angelsotob/menus-app/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/angelsotob/menus-app/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/angelsotob/menus-app/compare/v0.1.0...v0.2.0
