@@ -162,7 +162,7 @@ class MainWindow:
     def show_about(self) -> None:
         """Diálogo 'Acerca de' con logo, versión, autor, descripción, enlace y licencia."""
         # ⚠️ Ideal: mover a core/config.py
-        VERSION = "0.6.0 (en desarrollo)"
+        VERSION = "0.6.1 (en desarrollo)"
         AUTHOR = "Ángel Soto"
         WEBSITE = "https://example.com/manual"
         DESCRIPTION = (
