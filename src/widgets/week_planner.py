@@ -11,7 +11,7 @@ from core.export_qt import export_widget_to_image, export_widget_to_pdf
 from core.models import WeekMenu
 from core.repository import Repo
 from core.rules_engine import RulesEngine, format_violations
-from ui import load_ui
+from ui import apply_window_defaults, load_ui
 from widgets.day_editor import DayEditor, MealItem
 from widgets.print_views import WeekPrintView
 
@@ -42,6 +42,7 @@ class WeekPlanner(QWidget):
         super().__init__(parent)
         self.ui = load_ui("week_planner.ui")
         self.setLayout(self.ui.layout())
+        apply_window_defaults(self)
         self.repo = repo
 
         # One DayEditor per tab
@@ -187,14 +188,15 @@ class WeekPlanner(QWidget):
             QMessageBox.information(self, "Exportado", f"Semana exportada a imagen:\n{fn}")
 
     # ---------- validate ----------
-
     def _validate_week(self) -> None:
         """Validate current week against rules."""
         wm = self.to_week_menu()
         rules = self.repo.load_rules()
         engine = RulesEngine(self.repo)
-        # orden correcto: (week, rules)
         violations = engine.validate_week(wm, rules)
-        # sin scope=
         msg = format_violations(violations)
         QMessageBox.information(self, "Validación de reglas (semana)", msg or "Todo correcto ✅")
+
+    # API para MainWindow al cambiar de perfil
+    def set_repo(self, repo: Repo) -> None:
+        self.repo = repo
