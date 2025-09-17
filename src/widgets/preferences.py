@@ -13,7 +13,7 @@ from core.config import (
     profile_root,
     set_selected_profile,
 )
-from ui import load_ui
+from ui import apply_window_defaults, load_ui
 
 
 class PreferencesDialog(QDialog):
@@ -24,6 +24,7 @@ class PreferencesDialog(QDialog):
         super().__init__(parent)
         self.ui = load_ui("preferences.ui")
         self.setLayout(self.ui.layout())
+        apply_window_defaults(self)
         self.repo = repo
 
         # General Data

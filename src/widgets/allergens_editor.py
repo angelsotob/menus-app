@@ -3,7 +3,7 @@ from __future__ import annotations
 from PySide6.QtWidgets import QDialog, QInputDialog
 
 from core.repository import Repo
-from ui import load_ui
+from ui import apply_window_defaults, load_ui
 
 
 class AllergensEditor(QDialog):
@@ -11,6 +11,7 @@ class AllergensEditor(QDialog):
         super().__init__(parent)
         self.ui = load_ui("allergens_editor.ui")
         self.setLayout(self.ui.layout())
+        apply_window_defaults(self)
         self.repo = repo
 
         self._reload()

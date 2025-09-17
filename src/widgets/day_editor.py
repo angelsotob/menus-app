@@ -26,7 +26,7 @@ from core.export_qt import export_widget_to_image, export_widget_to_pdf
 from core.models import DayMeals, DayMenu, Food
 from core.repository import Repo
 from core.rules_engine import RulesEngine, format_violations
-from ui import load_ui
+from ui import apply_window_defaults, load_ui
 from widgets.print_views import DayPrintView
 
 
@@ -124,6 +124,7 @@ class DayEditor(QWidget):
         super().__init__(parent)
         self.ui = load_ui("day_editor.ui")
         self.setLayout(self.ui.layout())
+        apply_window_defaults(self)
 
         self.repo = repo
         self._refresh_foods_map()

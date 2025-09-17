@@ -6,7 +6,7 @@ from PySide6.QtWidgets import QDialog, QMessageBox
 
 from core.i18n import OP_SYMBOL2LONGWORD_ES, OP_WORD2SYMBOL_ES
 from core.repository import Repo
-from ui import load_ui
+from ui import apply_window_defaults, load_ui
 
 RENDER_OP_ES = {
     ">=": "al menos",
@@ -30,6 +30,7 @@ class RulesEditor(QDialog):
         super().__init__(parent)
         self.ui = load_ui("rules_editor.ui")
         self.setLayout(self.ui.layout())
+        apply_window_defaults(self)
         self.repo = repo
 
         # UI init
@@ -38,6 +39,10 @@ class RulesEditor(QDialog):
         self._init_ops()
         self._init_categories()
         self._init_foods()
+
+        # --- NUEVO: filtrar alimentos al cambiar categoría ---
+        self.ui.cmbCategory.currentIndexChanged.connect(self._reload_foods_by_selected_category)
+        self._reload_foods_by_selected_category()  # inicial
 
         # Mostrar vista legible por defecto; ocultar JSON
         self.ui.txtJson.setVisible(False)
@@ -79,7 +84,6 @@ class RulesEditor(QDialog):
     def _init_ops(self) -> None:
         self.ui.cmbOp.clear()
         # Mostrar en texto; mapear a símbolo al guardar
-        # OP_SYMBOL2LONGWORD_ES: {">=":"mayor o igual que", ...}
         for sym, long_word in OP_SYMBOL2LONGWORD_ES.items():
             self.ui.cmbOp.addItem(long_word, sym)
 
@@ -92,12 +96,9 @@ class RulesEditor(QDialog):
             self.ui.cmbCategory.addItem(c, c)
 
     def _init_foods(self) -> None:
-        foods = self.repo.list_foods()
+        # Inicialización mínima; el llenado real lo hace _reload_foods_by_selected_category()
         self.ui.cmbFood.clear()
         self.ui.cmbFood.addItem("Todos", "Todos")
-        for f in foods:
-            # Mostramos (nombre) y guardamos el nombre como valor
-            self.ui.cmbFood.addItem(f.name, f.name)
 
     # ---------- helpers ----------
     def _rules_from_editor(self) -> dict:
@@ -119,11 +120,30 @@ class RulesEditor(QDialog):
         # Mantén todos visibles (sencillo). Si quieres, aquí puedes ocultar por tipo.
         return
 
+    # ---------- NUEVO: filtrado de alimentos por categoría seleccionada ----------
+    def _selected_category(self) -> str | None:
+        cat = self.ui.cmbCategory.currentData()
+        return cat if isinstance(cat, str) and cat.strip() else None
+
+    def _reload_foods_by_selected_category(self) -> None:
+        cat = self._selected_category()
+        foods = self.repo.list_foods()
+        if cat:
+            foods = [f for f in foods if f.category == cat]
+
+        self.ui.cmbFood.blockSignals(True)
+        try:
+            self.ui.cmbFood.clear()
+            self.ui.cmbFood.addItem("Todos", "Todos")
+            for f in foods:
+                self.ui.cmbFood.addItem(f.name, f.name)
+        finally:
+            self.ui.cmbFood.blockSignals(False)
+
     # ---------- pretty render ----------
     def _op_text(self, op: str | None) -> str:
         if not op:
             return ""
-        # Si viene ya en texto largo lo devolvemos; si es símbolo, usamos el render “amable”
         return RENDER_OP_ES.get(op, op)
 
     def _rule_to_text(self, scope: str, r: dict) -> str:
@@ -135,7 +155,6 @@ class RulesEditor(QDialog):
             cat_lc = cat.lower() if cat else ""
             op = self._op_text(r.get("op"))
             qty = str(r.get("quantity", ""))
-            # Ej.: "Debería haber diariamente al menos 2 vegetales en el menú."
             return f"Debería haber {s_scope} {op} {qty} {cat_lc} en el menú."
 
         if rtype == "item_count":
@@ -145,20 +164,16 @@ class RulesEditor(QDialog):
             op = self._op_text(r.get("op"))
             qty = str(r.get("quantity", ""))
             if fname.lower() == "todos":
-                # Ej.: "Debería haber diariamente al menos 2 elementos de fruta."
                 return f"Debería haber {s_scope} {op} {qty} elementos{cat_part}."
-            # Ej.: "Debería haber diariamente al menos 1 aguacate de fruta en el menú."
             return f"Debería haber {s_scope} {op} {qty} {fname}{cat_part} en el menú."
 
         if rtype == "forbid_allergen":
             aller = (r.get("allergen") or "").strip()
             suf = "en el día" if scope == "daily" else "en la semana"
-            # Ej.: "No debe aparecer el alérgeno Gluten en el día."
             return f"No debe aparecer el alérgeno {aller} {suf}."
 
         if rtype == "do_not_repeat_consecutive_item":
             name = (r.get("name") or "").strip()
-            # Ej.: "No repetir Salmón en días consecutivos (semanal)."
             return f"No repetir {name} en días consecutivos (semanal)."
 
         return f"Regla {rtype}"
@@ -301,7 +316,6 @@ class RulesEditor(QDialog):
             rules[scope].append(rule)
 
         elif rtype == "forbid_allergen":
-            # Placeholder simple por ahora: “Gluten”
             rule = {"type": "forbid_allergen", "allergen": "Gluten"}
             rules[scope].append(rule)
 
@@ -336,7 +350,5 @@ class RulesEditor(QDialog):
         vis = self.ui.txtJson.isVisible()
         self.ui.txtJson.setVisible(not vis)
         self.ui.btnToggleJson.setText("Ocultar JSON" if not vis else "Ver JSON")
-        # Por si el usuario ha editado el JSON y lo vuelve a ocultar, refrescamos vista.
         if vis is True:
-            # Se ocultará ahora → refrescamos la vista legible desde el texto actual
             self._refresh_rules_view()

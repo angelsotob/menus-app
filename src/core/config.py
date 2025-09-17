@@ -5,6 +5,8 @@ from pathlib import Path
 
 APP_NAME = "MenusApp"
 ACTIVE_FILE = "active.txt"  # Saves active profile name
+APP_DISPLAY_NAME = "NutriPlan"  # nombre visible centralizado
+DEFAULT_WINDOW_SIZE = (1200, 800)  # tamaño por defecto (ancho, alto)
 
 
 def get_data_dir() -> Path:

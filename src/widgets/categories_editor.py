@@ -11,7 +11,7 @@ from PySide6.QtWidgets import (
 )
 
 from core.repository import Repo
-from ui import load_ui
+from ui import apply_window_defaults, load_ui
 
 MEAL_KEYS = ["breakfast", "midmorning", "lunch", "snack", "dinner"]
 MEAL_TITLES = {
@@ -38,6 +38,7 @@ class CategoriesEditor(QDialog):
         super().__init__(parent)
         self.ui = load_ui("categories_editor.ui")
         self.setLayout(self.ui.layout())
+        apply_window_defaults(self)
         self.setWindowTitle("Categorías")
 
         self.repo = repo
@@ -201,7 +202,7 @@ class CategoriesEditor(QDialog):
             mapping[k] = [c for c in mapping.get(k, []) if c != name]
         self._set_by_meal(mapping)
 
-        # remap foods from deleted category to 'Others' if exist
+        # remap foods from deleted category to 'Otros' if exist
         moved = self.repo.remap_deleted_category(name, fallback="Otros")
         if moved:
             self._foods_affected = True
